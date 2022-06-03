@@ -487,7 +487,7 @@ function DataTable2() {
       </div>
       <ThemeProvider theme={theme}>
         <MUIDataTable
-          title={"ACME Employee list"}
+          title={"Employee list"}
           data={data}
           columns={columns}
           options={options}
