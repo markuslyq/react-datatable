@@ -447,14 +447,15 @@ function DataTable2() {
   });
 
   const options = {
-    filter: true,
-    filterArrayFullMatch: filterArrayFullMatch,
-    filterType: "dropdown",
-    responsive: "standard",
     draggableColumns: {
       enabled: true,
       transitionTime: 300,
     },
+    filter: true,
+    filterArrayFullMatch: filterArrayFullMatch,
+    filterType: "dropdown",
+    responsive: "standard",
+    confirmFilters: true, 
   };
 
   return (
