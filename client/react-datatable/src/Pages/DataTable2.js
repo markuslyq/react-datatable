@@ -109,19 +109,20 @@ function DataTable2() {
   }, []);
 
   const columns = [
-    {
-      name: "user_id",
-      label: "User ID",
-      options: {
-        filter: false,
-        display: "excluded",
-      },
-    },
+    // {
+    //   name: "user_id",
+    //   label: "User ID",
+    //   options: {
+    //     filter: false,
+    //     display: "excluded",
+    //   },
+    // },
     {
       name: "name",
       label: "Name",
       options: {
-        filter: false,
+        filter: true,
+        display: false,
         sortThirdClickReset: true,
         setCellProps: () => ({ style: styles.regularTableCell }),
       },
@@ -131,7 +132,7 @@ function DataTable2() {
       label: "Phone",
       options: {
         print: false,
-        filter: false,
+        filter: true,
         sortThirdClickReset: true,
         setCellProps: () => ({ style: styles.regularTableCell }),
       },
@@ -280,32 +281,7 @@ function DataTable2() {
         sort: false,
         setCellProps: () => ({ style: { padding: 0 } }),
         customHeadLabelRender: (columnMeta) => {
-          let columnName = columnMeta.name;
-          let subHeaders = [];
-          if (data.length != 0) {
-            let subHeaderObj = data[0][columnName];
-            for (let key in subHeaderObj) {
-              key = capitalizeFirstLetter(key);
-              subHeaders.push(key);
-            }
-            subHeaders = subHeaders.sort();
-          }
-          return (
-            <th>
-              <div>
-                <TableRow style={styles.multiValueMainHeader}>
-                  <div>{columnMeta.label}</div>
-                </TableRow>
-                <TableRow>
-                  {subHeaders.map((subHeader) => (
-                    <TableCell style={styles.multiValueSubHeader}>
-                      {subHeader}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              </div>
-            </th>
-          );
+          return renderSubHeader(columnMeta);
         },
         customBodyRender: (value, tableMeta, updateValue) => {
           let subKeys = [];
@@ -457,6 +433,12 @@ function DataTable2() {
     filterType: "multiselect",
     responsive: "standard",
     confirmFilters: true, 
+    print: false,
+    download: false,
+    columnOrder: [12, 10, 2, 3, 4, 5, 1, 7, 6, 8, 9, 11, 0],
+    onColumnOrderChange: (newColumnOrder, columnIndex, newPosition) => {
+      console.log(newColumnOrder);
+    },
     customFilterDialogFooter: (currentFilterList, applyNewFilters) => {
       return (
         <div style={{ marginTop: '40px' }}>
@@ -504,6 +486,35 @@ function DataTable2() {
       </ThemeProvider>
     </>
   );
+
+  function renderSubHeader(columnMeta) {
+    let columnName = columnMeta.name;
+    let subHeaders = [];
+    if (data.length != 0) {
+      let subHeaderObj = data[0][columnName];
+      for (let key in subHeaderObj) {
+        key = capitalizeFirstLetter(key);
+        subHeaders.push(key);
+      }
+      subHeaders = subHeaders.sort();
+    }
+    return (
+      <th>
+        <div>
+          <TableRow style={styles.multiValueMainHeader}>
+            <div>{columnMeta.label}</div>
+          </TableRow>
+          <TableRow>
+            {subHeaders.map((subHeader) => (
+              <TableCell style={styles.multiValueSubHeader}>
+                {subHeader}
+              </TableCell>
+            ))}
+          </TableRow>
+        </div>
+      </th>
+    );
+  }
 }
 
 export default DataTable2;

@@ -50,7 +50,19 @@ app.get("/get", (req, res) => {
   console.log("get");
   db.query(
     `SELECT 
-      *, 
+      user_id,
+      name,
+      phone,
+      email,
+      start_date,
+      end_date,
+      deadline,
+      postal_code,
+      country,
+      age,
+      password,
+      notes,
+      cars, 
       JSON_OBJECT('company', previous_company, 'department', department, 'years', years_stayed) AS previous_company_info
       FROM (
         SELECT 
