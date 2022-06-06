@@ -15,7 +15,6 @@ import Paper from "@mui/material/Paper";
 import IconButton from "@mui/material/IconButton";
 
 import axios from "axios";
-import Radium from "radium";
 
 import { Link } from "react-router-dom";
 
@@ -114,7 +113,7 @@ function DataTable2() {
       name: "user_id",
       label: "User ID",
       options: {
-        filter: true,
+        filter: false,
         display: "excluded",
       },
     },
@@ -122,13 +121,14 @@ function DataTable2() {
       name: "name",
       label: "Name",
       options: {
-        filter: true,
+        filter: false,
         sortThirdClickReset: true,
         setCellProps: () => ({ style: styles.regularTableCell }),
       },
     },
     {
       name: "phone",
+      label: "Phone",
       options: {
         print: false,
         filter: false,
@@ -138,8 +138,9 @@ function DataTable2() {
     },
     {
       name: "email",
+      label: "Email",
       options: {
-        filter: true,
+        filter: false,
         print: false,
         sortThirdClickReset: true,
         setCellProps: () => ({ style: styles.regularTableCell }),
@@ -149,7 +150,7 @@ function DataTable2() {
       name: "start_date",
       label: "Start Date",
       options: {
-        filter: true,
+        filter: false,
         sortThirdClickReset: true,
         setCellProps: () => ({ style: styles.regularTableCell }),
         customBodyRender: (value, tableMeta, updateValue) => {
@@ -165,7 +166,7 @@ function DataTable2() {
       name: "end_date",
       label: "End Date",
       options: {
-        filter: true,
+        filter: false,
         sortThirdClickReset: true,
         setCellProps: () => ({ style: styles.regularTableCell }),
         customBodyRender: (value, tableMeta, updateValue) => {
@@ -181,7 +182,7 @@ function DataTable2() {
       name: "deadline",
       label: "Deadline",
       options: {
-        filter: true,
+        filter: false,
         sortThirdClickReset: true,
         setCellProps: () => ({ style: styles.regularTableCell }),
         customBodyRender: (value, tableMeta, updateValue) => {
@@ -197,7 +198,7 @@ function DataTable2() {
       name: "postal_code",
       label: "Postal Zip",
       options: {
-        filter: true,
+        filter: false,
         sortThirdClickReset: true,
         setCellProps: () => ({ style: styles.regularTableCell }),
       },
@@ -206,7 +207,7 @@ function DataTable2() {
       name: "country",
       label: "Country",
       options: {
-        filter: true,
+        filter: false,
         sortThirdClickReset: true,
         setCellProps: () => ({ style: styles.regularTableCell }),
       },
@@ -215,7 +216,7 @@ function DataTable2() {
       name: "age",
       label: "Age",
       options: {
-        filter: true,
+        filter: false,
         sortThirdClickReset: true,
         setCellProps: () => ({ style: styles.regularTableCell }),
       },
@@ -224,7 +225,7 @@ function DataTable2() {
       name: "cars",
       label: "Cars",
       options: {
-        filter: true,
+        filter: false,
         sort: false,
         setCellProps: () => ({ style: styles.regularTableCell }),
         customBodyRender: (value, tableMeta, updateValue) => {
@@ -275,7 +276,7 @@ function DataTable2() {
       name: "previous_company_info",
       label: "Previous Companies",
       options: {
-        filter: true,
+        filter: false,
         sort: false,
         setCellProps: () => ({ style: { padding: 0 } }),
         customHeadLabelRender: (columnMeta) => {
@@ -360,7 +361,7 @@ function DataTable2() {
       name: "notes",
       label: "Notes",
       options: {
-        filter: true,
+        filter: false,
         sort: false,
         setCellProps: () => ({ style: styles.regularTableCell }),
         customBodyRender: (value, tableMeta, updateValue) => {
@@ -453,9 +454,16 @@ function DataTable2() {
     },
     filter: true,
     filterArrayFullMatch: filterArrayFullMatch,
-    filterType: "dropdown",
+    filterType: "multiselect",
     responsive: "standard",
     confirmFilters: true, 
+    customFilterDialogFooter: (currentFilterList, applyNewFilters) => {
+      return (
+        <div style={{ marginTop: '40px' }}>
+          <Button variant="contained" onClick={() => applyNewFilters()}>Apply</Button>
+        </div>
+      );
+    }
   };
 
   return (
