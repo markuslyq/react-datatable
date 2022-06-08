@@ -13,102 +13,53 @@ import TableContainer from "@mui/material/TableContainer";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import IconButton from "@mui/material/IconButton";
+import ToolbarWithFilter from "../Components/ToolbarWithFilter";
 
 import axios from "axios";
 
 import { Link } from "react-router-dom";
 
-function DataTable2() {
-  const [filterArrayFullMatch, setFilterArrayFullMatch] = useState(true);
+function capitalizeFirstLetter(str) {
+  // converting first letter to uppercase
+  const capitalized = str.charAt(0).toUpperCase() + str.slice(1);
 
-  const [data, setData] = useState([]);
+  return capitalized;
+}
 
-  function capitalizeFirstLetter(str) {
-    // converting first letter to uppercase
-    const capitalized = str.charAt(0).toUpperCase() + str.slice(1);
-
-    return capitalized;
+function getSubHeaders(subHeaderObj) {
+  let subHeaders = [];
+  for (let key in subHeaderObj) {
+    key = capitalizeFirstLetter(key);
+    subHeaders.push(key);
   }
+  subHeaders = subHeaders.sort();
+  return subHeaders;
+}
 
-  const isIsoDate = (dateStr) => {
-    if (!/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/.test(dateStr))
-      return false;
-    var d = new Date(dateStr);
-    return d.toISOString() === dateStr;
-  };
-
-  const processDate = (dataToProcess) => {
-    for (let i = 0; i < dataToProcess.length; i++) {
-      for (let key in dataToProcess[i]) {
-        if (isIsoDate(dataToProcess[i][key])) {
-          let newDate = new Date(dataToProcess[i][key]);
-          dataToProcess[i][key] = newDate;
+function getDataType(data, key) {
+  for (let i = 0; i < data.length; i++) {
+    let variable = data[i][key];
+    if (variable !== null) {
+      if (typeof variable === "object") {
+        //Return "Array" if object is an array
+        if (Array.isArray(variable)) {
+          return "array";
         }
+        //Return "Date" if object is a Date Object
+        if (variable instanceof Date) {
+          return "date";
+        }
+        return getSubHeaders(variable);
       }
+      return typeof variable;
     }
-    return dataToProcess;
-  };
+  }
+  return null;
+}
 
-  const getNumRows = (val, keys) => {
-    let numRows = 1;
-    keys.forEach((key) => {
-      if (val[key] != null) {
-        let currNumRows = val[key].length;
-        if (currNumRows > numRows) {
-          numRows = currNumRows;
-        }
-      }
-    });
-    return numRows;
-  };
+function DataTable2() {
 
-  const formatRows = (val, keys) => {
-    let numRows = getNumRows(val, keys);
-    let rows = [];
-    for (let i = 0; i < numRows; i++) {
-      let individualRow = {};
-      keys.forEach((key) => {
-        if (val[key] != null) {
-          individualRow[key] = val[key][i];
-        } else {
-          individualRow[key] = null;
-        }
-      });
-      rows.push(individualRow);
-    }
-    return rows;
-  };
-
-  const getMaxHeight = (dataRow) => {
-    let maxHeight = 40;
-    for (let key in dataRow) {
-      if (typeof dataRow[key] === "object") {
-        if (dataRow[key] != null) {
-          let height = 10 + dataRow[key].length * 30;
-          if (height > maxHeight) {
-            maxHeight = height;
-          }
-        }
-      }
-    }
-    return maxHeight;
-  };
-
-  const handleGet = () => {
-    axios.get("http://localhost:3001/get").then((response) => {
-      console.log("Get Button Pressed");
-      console.log(response);
-      response.data = processDate(response.data);
-      setData(response.data);
-    });
-  };
-
-  useEffect(() => {
-    console.log("Current Page: DataTable");
-    handleGet();
-  }, []);
-
-  const columns = [
+  const columnsDetails = [
     // {
     //   name: "user_id",
     //   label: "User ID",
@@ -122,7 +73,6 @@ function DataTable2() {
       label: "Name",
       options: {
         filter: true,
-        display: false,
         sortThirdClickReset: true,
         setCellProps: () => ({ style: styles.regularTableCell }),
       },
@@ -237,7 +187,7 @@ function DataTable2() {
                 <TableBody>
                   {value.map((val, key) => {
                     return (
-                      <TableRow>
+                      <TableRow key={key}>
                         <TableCell
                           sx={styles.innerTableCell}
                           align="left"
@@ -284,43 +234,7 @@ function DataTable2() {
           return renderSubHeader(columnMeta);
         },
         customBodyRender: (value, tableMeta, updateValue) => {
-          let subKeys = [];
-          for (let key in value) {
-            subKeys.push(key);
-          }
-          subKeys = subKeys.sort();
-          let rows = formatRows(value, subKeys);
-          let maxHeight = getMaxHeight(data[tableMeta.rowIndex]);
-          return (
-            <Table sx={{ height: maxHeight + 10 }}>
-              <TableBody>
-                {rows.map((row) => {
-                  return (
-                    <TableRow>
-                      {subKeys.map((subKey) => {
-                        return (
-                          <TableCell
-                            style={{
-                              padding: 10,
-                              width: "150px",
-                              textAlign: "Left",
-                            }}
-                            component={Paper}
-                          >
-                            {row[subKey] === null
-                              ? "--"
-                              : row[subKey] == ""
-                              ? "-"
-                              : row[subKey]}
-                          </TableCell>
-                        );
-                      })}
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          );
+          return renderSubBody(value, tableMeta);
         },
       },
     },
@@ -368,6 +282,100 @@ function DataTable2() {
     },
   ];
 
+  const [filterArrayFullMatch, setFilterArrayFullMatch] = useState(true);
+  const [data, setData] = useState([]);
+  const [columns, setColumns] = useState(columnsDetails);
+
+  const isIsoDate = (dateStr) => {
+    if (!/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/.test(dateStr))
+      return false;
+    var d = new Date(dateStr);
+    return d.toISOString() === dateStr;
+  };
+
+  const processDate = (dataToProcess) => {
+    for (let i = 0; i < dataToProcess.length; i++) {
+      for (let key in dataToProcess[i]) {
+        if (isIsoDate(dataToProcess[i][key])) {
+          let newDate = new Date(dataToProcess[i][key]);
+          dataToProcess[i][key] = newDate;
+        }
+      }
+    }
+    return dataToProcess;
+  };
+
+  const addDataType = (cols, dataToProcess) => {
+    for (let i = 0; i < cols.length; i++) {
+      cols[i]["dataType"] = getDataType(dataToProcess, cols[i].name);
+      if (Array.isArray(cols[i]["dataType"])) {
+        cols[i]["subHeaders"] = cols[i]["dataType"];
+        cols[i]["dataType"] = "object";
+      }
+    }
+    return cols;
+  };
+
+  const getNumRows = (val, keys) => {
+    let numRows = 1;
+    keys.forEach((key) => {
+      if (val[key] != null) {
+        let currNumRows = val[key].length;
+        if (currNumRows > numRows) {
+          numRows = currNumRows;
+        }
+      }
+    });
+    return numRows;
+  };
+
+  const formatRows = (val, keys) => {
+    let numRows = getNumRows(val, keys);
+    let rows = [];
+    for (let i = 0; i < numRows; i++) {
+      let individualRow = {};
+      keys.forEach((key) => {
+        if (val[key] != null) {
+          individualRow[key] = val[key][i];
+        } else {
+          individualRow[key] = null;
+        }
+      });
+      rows.push(individualRow);
+    }
+    return rows;
+  };
+
+  const getMaxHeight = (dataRow) => {
+    let maxHeight = 40;
+    for (let key in dataRow) {
+      if (typeof dataRow[key] === "object") {
+        if (dataRow[key] != null) {
+          let height = 10 + dataRow[key].length * 30;
+          if (height > maxHeight) {
+            maxHeight = height;
+          }
+        }
+      }
+    }
+    return maxHeight;
+  };
+
+  const handleGet = () => {
+    axios.get("http://localhost:3001/get").then((response) => {
+      console.log(response);
+      response.data = processDate(response.data);
+      setData(response.data);
+      let columnsInfo = addDataType(columnsDetails, response.data);
+      setColumns(columnsInfo);
+    });
+  };
+
+  useEffect(() => {
+    console.log("Current Page: DataTable");
+    handleGet();
+  }, []);
+
   const styles = {
     regularTableCell: {
       paddingTop: 0,
@@ -404,7 +412,7 @@ function DataTable2() {
     },
     multiValueSubHeader: {
       cursor: "pointer",
-      minWidth: "150px",
+      minWidth: "10em",
       borderBottom: "0px",
       textAlign: "center",
     },
@@ -428,24 +436,33 @@ function DataTable2() {
       enabled: true,
       transitionTime: 300,
     },
-    filter: true,
+    filter: false,
     filterArrayFullMatch: filterArrayFullMatch,
     filterType: "multiselect",
     responsive: "standard",
-    confirmFilters: true, 
+    confirmFilters: true,
     print: false,
     download: false,
-    columnOrder: [12, 10, 2, 3, 4, 5, 1, 7, 6, 8, 9, 11, 0],
+    // columnOrder: [12, 10, 2, 3, 4, 5, 1, 7, 6, 8, 9, 11, 0],
     onColumnOrderChange: (newColumnOrder, columnIndex, newPosition) => {
       console.log(newColumnOrder);
     },
-    customFilterDialogFooter: (currentFilterList, applyNewFilters) => {
+    // customFilterDialogFooter: (currentFilterList, applyNewFilters) => {
+    //   return (
+    //     <div style={{ marginTop: '40px' }}>
+    //       <Button variant="contained" onClick={() => applyNewFilters()}>Apply</Button>
+    //     </div>
+    //   );
+    // }
+    customToolbar: () => {
       return (
-        <div style={{ marginTop: '40px' }}>
-          <Button variant="contained" onClick={() => applyNewFilters()}>Apply</Button>
-        </div>
+        <ToolbarWithFilter
+          columns={columns}
+          data={data}
+          filteredData={setData}
+        />
       );
-    }
+    },
   };
 
   return (
@@ -487,31 +504,69 @@ function DataTable2() {
     </>
   );
 
-  function renderSubHeader(columnMeta) {
-    let columnName = columnMeta.name;
-    let subHeaders = [];
-    if (data.length != 0) {
-      let subHeaderObj = data[0][columnName];
-      for (let key in subHeaderObj) {
-        key = capitalizeFirstLetter(key);
-        subHeaders.push(key);
-      }
-      subHeaders = subHeaders.sort();
+  function renderSubBody(value, tableMeta) {
+    let subKeys = [];
+    for (let key in value) {
+      subKeys.push(key);
     }
+    subKeys = subKeys.sort();
+    let rows = formatRows(value, subKeys);
+    let maxHeight = getMaxHeight(data[tableMeta.rowIndex]);
+    return (
+      <Table sx={{ height: maxHeight + 10 }}>
+        <TableBody>
+          {rows.map((row) => {
+            return (
+              <TableRow>
+                {subKeys.map((subKey) => {
+                  return (
+                    <TableCell
+                      style={{
+                        padding: 10,
+                        width: "10em",
+                        textAlign: "Left",
+                      }}
+                      component={Paper}
+                    >
+                      {row[subKey] === null
+                        ? "--"
+                        : row[subKey] === ""
+                        ? "-"
+                        : row[subKey]}
+                    </TableCell>
+                  );
+                })}
+              </TableRow>
+            );
+          })}
+        </TableBody>
+      </Table>
+    );
+  }
+
+  function renderSubHeader(columnMeta) {
+    let columnIndex = columnMeta.index;
+    let subHeaders = [];
+    if ("subHeaders" in columns[columnIndex]) {
+      subHeaders = columns[columnIndex]["subHeaders"];
+    }
+    // if (data.length !== 0) {
+    //   let subHeaderObj = data[0][columnName];
+    //   subHeaders = getSubHeaders(subHeaderObj);
+    //   console.log("subHeaders: " + subHeaders);
+    // }
     return (
       <th>
-        <div>
-          <TableRow style={styles.multiValueMainHeader}>
-            <div>{columnMeta.label}</div>
-          </TableRow>
-          <TableRow>
-            {subHeaders.map((subHeader) => (
-              <TableCell style={styles.multiValueSubHeader}>
-                {subHeader}
-              </TableCell>
-            ))}
-          </TableRow>
-        </div>
+        <TableRow style={styles.multiValueMainHeader}>
+          {columnMeta.label}
+        </TableRow>
+        <TableRow>
+          {subHeaders.map((subHeader) => (
+            <TableCell style={styles.multiValueSubHeader}>
+              {subHeader}
+            </TableCell>
+          ))}
+        </TableRow>
       </th>
     );
   }
