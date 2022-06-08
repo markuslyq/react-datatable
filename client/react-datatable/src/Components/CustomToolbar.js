@@ -11,13 +11,15 @@ import {
   FormControl,
   FormControlLabel,
   InputLabel,
+  Menu,
   MenuItem,
   Select,
   OutlinedInput,
 } from "@mui/material";
 import FilterListIcon from "@mui/icons-material/FilterList";
+import FilterDialog from "./FilterDialog";
 
-export default function ToolbarWithFilter(props) {
+export default function CustomToolbar(props) {
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [columnSelected, setColumnSelected] = React.useState("");
 
@@ -36,11 +38,6 @@ export default function ToolbarWithFilter(props) {
     setDialogOpen(false);
   };
 
-  const handleColumnSelect = (event) => {
-    setColumnSelected(event.target.value);
-    console.log(columnSelected);
-  };
-
   return (
     <React.Fragment>
       <Tooltip title={"filter icon"}>
@@ -48,7 +45,7 @@ export default function ToolbarWithFilter(props) {
           <FilterListIcon />
         </IconButton>
       </Tooltip>
-      <Dialog
+      {/* <Dialog
         fullWidth={true}
         maxWidth="sm"
         open={dialogOpen}
@@ -80,27 +77,23 @@ export default function ToolbarWithFilter(props) {
                 id: "columnSelected",
               }}
             >
-              {columns.map((col) => {
-                if (col.dataType === "object") {
-                  return (
-                    <div>
-                      {col.subHeaders.map((subHeader) => {
-                        return (
-                          <MenuItem value={col.name + " - " + subHeader}>
-                            {col.label + " - " + subHeader}
-                          </MenuItem>
-                        );
-                      })}
-                    </div>
-                  );
-                } else {
-                  return <MenuItem value={col.name}> {col.label} </MenuItem>;
-                }
-              })}
+              {columns.map(
+                (col) =>
+                  col.dataType === "object" ? (
+                    col.subHeaders.map((subHeader) => (
+                      <MenuItem value={col.name + " - " + subHeader}>
+                        {col.label + " - " + subHeader}
+                      </MenuItem>
+                    ))
+                  ) : (
+                    <MenuItem value={col.name}> {col.label} </MenuItem>
+                  )
+              )}
             </Select>
           </FormControl>
         </Box>
-      </Dialog>
+      </Dialog> */}
+      <FilterDialog dialogOpen={dialogOpen} columns={columns} updateDialogStatus={setDialogOpen}/>
     </React.Fragment>
   );
 }
