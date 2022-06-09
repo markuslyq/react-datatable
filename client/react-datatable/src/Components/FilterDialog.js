@@ -12,11 +12,15 @@ import {
   FormControl,
   FormControlLabel,
   InputLabel,
-  Menu,
   MenuItem,
   Select,
-  OutlinedInput,
+  Autocomplete,
+  TextField,
+  Chip,
 } from "@mui/material";
+// import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+// import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+// import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import FilterListIcon from "@mui/icons-material/FilterList";
 
 export default function FilterDialog(props) {
@@ -24,29 +28,38 @@ export default function FilterDialog(props) {
   const [dataType, setDataType] = useState(null);
   const [columnSelected, setColumnSelected] = useState("");
   const [conditionSelected, setConditionSelected] = useState("");
+  const [renderSelected, setRenderSelected] = useState("");
+
+
 
   const columns = props.columns;
+  const data = props.data;
 
-  const conditionsCriteria = [
+  const filterCriteria = [
     {
       dataType: "string",
       conditionOptions: ["EQUAL", "NOT EQUAL", "CONTAIN"],
+      renderOptions: ["multiEntry", "multiEntry", "multiEntryFreeSolo"],
     },
     {
       dataType: "date",
       conditionOptions: ["AFTER", "BEFORE", "BETWEEN", "ISEMPTY"],
+      renderOptions: ["datePicker", "datePicker", "twoDatePicker", "empty"],
     },
     {
       dataType: "number",
       conditionOptions: ["EQUALS", "LESS THAN", "MORE THAN"],
+      renderOptions: ["numOnlyTextBox", "numOnlyTextBox", "numOnlyTextBox"],
     },
     {
       dataType: "array",
       conditionOptions: ["IN LIST", "NOT IN LIST", "LIST NOT EQUAL", "CONTAIN"],
+      renderOptions: ["multiEntry", "multiEntry", "multiEntry", "multiEntry"],
     },
     {
       dataType: "object",
       conditionOptions: ["IN LIST", "NOT IN LIST", "LIST NOT EQUAL", "CONTAIN"],
+      renderOptions: ["multiEntry", "multiEntry", "multiEntry", "multiEntry"],
     },
   ];
 
@@ -62,12 +75,133 @@ export default function FilterDialog(props) {
 
   const getConditionOptions = () => {
     if (dataType) {
-      let conditionObj = conditionsCriteria.find(
+      let filterObj = filterCriteria.find(
         (conditionObj) => conditionObj.dataType == dataType
       );
-      return conditionObj.conditionOptions;
+      return filterObj.conditionOptions;
     }
     return [];
+  };
+
+  const getRenderOption = () => {
+    if (dataType && conditionSelected) {
+      let filterObj = filterCriteria.find(
+        (conditionObj) => conditionObj.dataType == dataType
+      );
+      let index = filterObj.conditionOptions.indexOf(conditionSelected);
+      return filterObj.renderOptions[index];
+    }
+    return "";
+  };
+
+  const getTextBoxOptions = () => {
+    let textBoxOptions = new Set();
+    if (dataType && conditionSelected) {
+      for (let i = 0; i < data.length; i++) {
+        let dataObj = data[i];
+        let columnNameSplit = columnSelected.split(".");
+        if (columnNameSplit.length === 2) {
+          let selectedColVals = dataObj[columnNameSplit[0]][columnNameSplit[1]];
+          if (selectedColVals === null) {
+            textBoxOptions.add("--");
+          } else if (selectedColVals === "") {
+            textBoxOptions.add("-");
+          } else {
+            selectedColVals.map((subHeaderValues) =>
+              textBoxOptions.add(subHeaderValues)
+            );
+          }
+        } else {
+          let selectedColVals = dataObj[columnSelected];
+          if (selectedColVals !== null && Array.isArray(selectedColVals)) {
+            selectedColVals.map((colVal) => {
+              if (colVal === null) {
+                textBoxOptions.add("--");
+              } else if (colVal === "") {
+                textBoxOptions.add("-");
+              } else {
+                textBoxOptions.add(colVal);
+              }
+            });
+          } else if (selectedColVals === null) {
+            textBoxOptions.add("--");
+          } else if (selectedColVals === "") {
+            textBoxOptions.add("-");
+          } else {
+            textBoxOptions.add(selectedColVals);
+          }
+        }
+      }
+    }
+    return Array.from(textBoxOptions);
+  };
+
+  const renderTextBox = () => {
+    if (dataType && conditionSelected) {
+      switch (renderSelected) {
+        case "multiEntry":
+          return (
+            <Autocomplete
+              multiple
+              id={dataType + " multiEntry"}
+              options={getTextBoxOptions()}
+              filterSelectedOptions
+              sx={{ m: 1, minWidth: 250 }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Value"
+                  placeholder="Filter Value"
+                />
+              )}
+            />
+          );
+        case "multiEntryFreeSolo":
+          return (
+            <Autocomplete
+              multiple
+              id="multiEntryFreeSolo"
+              options={getTextBoxOptions()}
+              freeSolo
+              sx={{ m: 1, minWidth: 250 }}
+              renderTags={(value, getTagProps) =>
+                value.map((option, index) => (
+                  <Chip
+                    variant="outlined"
+                    label={option}
+                    {...getTagProps({ index })}
+                  />
+                ))
+              }
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Value"
+                  placeholder="Filter Value"
+                />
+              )}
+            />
+          );
+        case "datePicker":
+          // <LocalizationProvider dateAdapter={AdapterDateFns}>
+          //   <DatePicker
+          //     label="Basic example"
+          //     value={value}
+          //     onChange={(newValue) => {
+          //       setValue(newValue);
+          //     }}
+          //     renderInput={(params) => <TextField {...params} />}
+          //   />
+          // </LocalizationProvider>;
+          break;
+        case "twoDatePicker":
+          break;
+        case "numOnlyTextBox":
+          break;
+        default:
+          return <></>;
+      }
+    }
   };
 
   const handleCloseDialog = () => {
@@ -77,6 +211,7 @@ export default function FilterDialog(props) {
 
   const handleColumnSelect = (event) => {
     setColumnSelected(event.target.value);
+    setConditionSelected("");
   };
 
   const handleConditionSelect = (event) => {
@@ -89,12 +224,14 @@ export default function FilterDialog(props) {
     getConditionOptions();
     console.log("column selected: " + columnSelected);
     console.log("condition selected: " + conditionSelected);
+    let textBoxToRender = getRenderOption();
+    setRenderSelected(textBoxToRender);
   });
 
   return (
     <Dialog
       fullWidth={true}
-      maxWidth="sm"
+      maxWidth="md"
       open={dialogOpen}
       onClose={handleCloseDialog}
     >
@@ -139,7 +276,7 @@ export default function FilterDialog(props) {
             </Select>
           </FormControl>
           <FormControl sx={{ m: 1, minWidth: 150 }}>
-            <InputLabel>Conditions</InputLabel>
+            <InputLabel>Condition</InputLabel>
             <Select
               value={conditionSelected}
               onChange={handleConditionSelect}
@@ -154,6 +291,7 @@ export default function FilterDialog(props) {
               ))}
             </Select>
           </FormControl>
+          {renderTextBox()}
         </Box>
       </DialogContent>
       <DialogActions>
