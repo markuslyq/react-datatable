@@ -18,9 +18,9 @@ import {
   TextField,
   Chip,
 } from "@mui/material";
-// import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-// import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-// import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import FilterListIcon from "@mui/icons-material/FilterList";
 
 export default function FilterDialog(props) {
@@ -30,7 +30,7 @@ export default function FilterDialog(props) {
   const [conditionSelected, setConditionSelected] = useState("");
   const [renderSelected, setRenderSelected] = useState("");
 
-
+  const [value, setValue] = useState(null);
 
   const columns = props.columns;
   const data = props.data;
@@ -183,17 +183,21 @@ export default function FilterDialog(props) {
             />
           );
         case "datePicker":
-          // <LocalizationProvider dateAdapter={AdapterDateFns}>
-          //   <DatePicker
-          //     label="Basic example"
-          //     value={value}
-          //     onChange={(newValue) => {
-          //       setValue(newValue);
-          //     }}
-          //     renderInput={(params) => <TextField {...params} />}
-          //   />
-          // </LocalizationProvider>;
-          break;
+          return (
+            <div style={{ padding: 8}}>
+              <LocalizationProvider dateAdapter={AdapterDateFns}>
+                <DatePicker
+                  label="Date"
+                  value={value}
+                  onChange={(newValue) => {
+                    setValue(newValue);
+                  }}
+                  sx={{ m: 1, minWidth: 50 }}
+                  renderInput={(params) => <TextField {...params} />}
+                />
+              </LocalizationProvider>
+            </div>
+          );
         case "twoDatePicker":
           break;
         case "numOnlyTextBox":
