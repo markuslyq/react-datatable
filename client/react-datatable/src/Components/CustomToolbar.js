@@ -1,21 +1,5 @@
 import React from "react";
-import {
-  Box,
-  IconButton,
-  Tooltip,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  FormControl,
-  FormControlLabel,
-  InputLabel,
-  Menu,
-  MenuItem,
-  Select,
-  OutlinedInput,
-} from "@mui/material";
+import { IconButton, Tooltip } from "@mui/material";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import FilterDialog from "./FilterDialog";
 
@@ -93,7 +77,11 @@ export default function CustomToolbar(props) {
           </FormControl>
         </Box>
       </Dialog> */}
-      <FilterDialog dialogOpen={dialogOpen} columns={columns} updateDialogStatus={setDialogOpen}/>
+      <FilterDialog
+        dialogOpen={dialogOpen}
+        columns={columns}
+        updateDialogStatus={setDialogOpen}
+      />
     </React.Fragment>
   );
 }

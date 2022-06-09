@@ -2,17 +2,18 @@ import React, { useState, useEffect } from "react";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import "../App.css";
 import MUIDataTable from "mui-datatables";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Button from "@mui/material/Button";
-import Switch from "@mui/material/Switch";
-import Table from "@mui/material/Table";
-import TableHead from "@mui/material/TableHead";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
-import IconButton from "@mui/material/IconButton";
+import {
+  FormControlLabel,
+  Button,
+  Switch,
+  Table,
+  TableHead,
+  TableBody,
+  TableCell,
+  TableRow,
+  Paper,
+  IconButton,
+} from "@mui/material";
 import CustomToolbar from "../Components/CustomToolbar";
 
 import axios from "axios";
@@ -58,16 +59,15 @@ function getDataType(data, key) {
 }
 
 function DataTable2() {
-
   const columnsDetails = [
-    // {
-    //   name: "user_id",
-    //   label: "User ID",
-    //   options: {
-    //     filter: false,
-    //     display: "excluded",
-    //   },
-    // },
+    {
+      name: "user_id",
+      label: "User ID",
+      options: {
+        filter: false,
+        display: false,
+      },
+    },
     {
       name: "name",
       label: "Name",
@@ -368,141 +368,9 @@ function DataTable2() {
       setData(response.data);
       let columnsInfo = addDataType(columnsDetails, response.data);
       setColumns(columnsInfo);
+      console.log(columns);
     });
   };
-
-  useEffect(() => {
-    console.log("Current Page: DataTable");
-    handleGet();
-  }, []);
-
-  const styles = {
-    regularTableCell: {
-      paddingTop: 0,
-      paddingBottom: 0,
-    },
-    longTextTableCell: {
-      paddingTop: 0,
-      paddingBottom: 0,
-      whiteSpace: "normal",
-    },
-    innerTable: {
-      minWidth: "max-content",
-      padding: 0,
-      marginRight: 0,
-    },
-    innerTableCell: {
-      padding: 1,
-      margin: 0,
-      height: 20,
-    },
-    multiValuesHeader: {
-      borderBottom: "1px solid rgba(224, 224, 224, 1)",
-    },
-    multiValueMainHeader: {
-      cursor: "pointer",
-      fontFamily: "Roboto-Regular",
-      fontWeight: 100,
-      fontSize: "0.875rem",
-      letterSpacing: "0.01071em",
-      display: "flex",
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    multiValueSubHeader: {
-      cursor: "pointer",
-      minWidth: "10em",
-      borderBottom: "0px",
-      textAlign: "center",
-    },
-  };
-
-  const theme = createTheme({
-    components: {
-      // Name of the component
-      MuiPaper: {
-        defaultProps: {
-          // The props to change the default for.
-          elevation: 1, // No more ripple, on the whole application 💣!
-          square: true,
-        },
-      },
-    },
-  });
-
-  const options = {
-    draggableColumns: {
-      enabled: true,
-      transitionTime: 300,
-    },
-    filter: false,
-    filterArrayFullMatch: filterArrayFullMatch,
-    filterType: "multiselect",
-    responsive: "standard",
-    confirmFilters: true,
-    print: false,
-    download: false,
-    // columnOrder: [12, 10, 2, 3, 4, 5, 1, 7, 6, 8, 9, 11, 0],
-    onColumnOrderChange: (newColumnOrder, columnIndex, newPosition) => {
-      console.log(newColumnOrder);
-    },
-    // customFilterDialogFooter: (currentFilterList, applyNewFilters) => {
-    //   return (
-    //     <div style={{ marginTop: '40px' }}>
-    //       <Button variant="contained" onClick={() => applyNewFilters()}>Apply</Button>
-    //     </div>
-    //   );
-    // }
-    customToolbar: () => {
-      return (
-        <CustomToolbar
-          columns={columns}
-          data={data}
-          filteredData={setData}
-        />
-      );
-    },
-  };
-
-  return (
-    <>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "space-between",
-        }}
-      >
-        <Link className="Link" to="/Home">
-          <IconButton aria-label="backArrow">
-            <img src={require("../Images/CSIT.png")} width="40%" />
-            {/* <ArrowLeftIcon />
-            <label style={{ fontSize: "15px" }}>HOME</label> */}
-          </IconButton>
-        </Link>
-        <FormControlLabel
-          control={
-            <Switch
-              checked={filterArrayFullMatch}
-              onChange={(e) => setFilterArrayFullMatch(e.target.checked)}
-              value="filterArray"
-              color="primary"
-            />
-          }
-          label="Fullmatch for Array filter"
-        />
-      </div>
-      <ThemeProvider theme={theme}>
-        <MUIDataTable
-          title={"Employee list"}
-          data={data}
-          columns={columns}
-          options={options}
-        />
-      </ThemeProvider>
-    </>
-  );
 
   function renderSubBody(value, tableMeta) {
     let subKeys = [];
@@ -570,6 +438,132 @@ function DataTable2() {
       </th>
     );
   }
+
+  useEffect(() => {
+    console.log("Current Page: DataTable");
+    handleGet();
+  }, []);
+
+  const styles = {
+    regularTableCell: {
+      paddingTop: 0,
+      paddingBottom: 0,
+    },
+    longTextTableCell: {
+      paddingTop: 0,
+      paddingBottom: 0,
+      whiteSpace: "normal",
+    },
+    innerTable: {
+      minWidth: "max-content",
+      padding: 0,
+      marginRight: 0,
+    },
+    innerTableCell: {
+      padding: 1,
+      margin: 0,
+      height: 20,
+    },
+    multiValuesHeader: {
+      borderBottom: "1px solid rgba(224, 224, 224, 1)",
+    },
+    multiValueMainHeader: {
+      cursor: "pointer",
+      fontFamily: "Roboto-Regular",
+      fontWeight: 100,
+      fontSize: "0.875rem",
+      letterSpacing: "0.01071em",
+      display: "flex",
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    multiValueSubHeader: {
+      cursor: "pointer",
+      minWidth: "10em",
+      borderBottom: "0px",
+      textAlign: "center",
+    },
+  };
+
+  const theme = createTheme({
+    components: {
+      // Name of the component
+      MuiPaper: {
+        defaultProps: {
+          // The props to change the default for.
+          elevation: 1, // No more ripple, on the whole application 💣!
+          square: true,
+        },
+      },
+      MuiButton: {
+        styleOverrides: {
+          root: {
+            textTransform: "none",
+            width: "max-content",
+          },
+        },
+      },
+    },
+  });
+
+  const options = {
+    draggableColumns: {
+      enabled: true,
+      transitionTime: 300,
+    },
+    filter: false,
+    filterArrayFullMatch: filterArrayFullMatch,
+    filterType: "multiselect",
+    responsive: "standard",
+    confirmFilters: true,
+    print: false,
+    download: false,
+    // columnOrder: [12, 10, 2, 3, 4, 5, 1, 7, 6, 8, 9, 11, 0],
+    onColumnOrderChange: (newColumnOrder, columnIndex, newPosition) => {
+      console.log(newColumnOrder);
+    },
+    // customFilterDialogFooter: (currentFilterList, applyNewFilters) => {
+    //   return (
+    //     <div style={{ marginTop: '40px' }}>
+    //       <Button variant="contained" onClick={() => applyNewFilters()}>Apply</Button>
+    //     </div>
+    //   );
+    // }
+    customToolbar: () => {
+      return (
+        <CustomToolbar columns={columns} data={data} filteredData={setData} />
+      );
+    },
+  };
+
+  return (
+    <>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "left",
+        }}
+      >
+        <Link className="Link" to="/Home">
+          <IconButton aria-label="backArrow">
+            <img src={require("../Images/CSIT.png")} width="40%" />
+            {/* <ArrowLeftIcon />
+            <label style={{ fontSize: "15px" }}>HOME</label> */}
+          </IconButton>
+        </Link>
+      </div>
+      <ThemeProvider theme={theme}>
+        <MUIDataTable
+          title={"Employee list"}
+          data={data}
+          columns={columns}
+          options={options}
+        />
+      </ThemeProvider>
+    </>
+  );
 }
 
 export default DataTable2;
