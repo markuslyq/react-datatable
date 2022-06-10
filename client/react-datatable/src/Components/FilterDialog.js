@@ -30,7 +30,11 @@ export default function FilterDialog(props) {
   const [conditionSelected, setConditionSelected] = useState("");
   const [renderSelected, setRenderSelected] = useState("");
 
-  const [value, setValue] = useState(null);
+  const [multiEntryValue, setMultiEntryValue] = useState(null);
+  const [filterDate, setFilterDate] = useState(null);
+  const [filterStartDate, setFilterStartDate] = useState(null);
+  const [filterEndDate, setFilterEndDate] = useState(null);
+  const [numberValue, setNumberValue] = useState(null);
 
   const columns = props.columns;
   const data = props.data;
@@ -141,67 +145,111 @@ export default function FilterDialog(props) {
       switch (renderSelected) {
         case "multiEntry":
           return (
-            <Autocomplete
-              multiple
-              id={dataType + " multiEntry"}
-              options={getTextBoxOptions()}
-              filterSelectedOptions
-              sx={{ m: 1, minWidth: 250 }}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Value"
-                  placeholder="Filter Value"
-                />
-              )}
-            />
+            <FormControl sx={{ m: 1, minWidth: 250 }}>
+              <Autocomplete
+                multiple
+                id={dataType + " multiEntry"}
+                options={getTextBoxOptions()}
+                filterSelectedOptions
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Value"
+                    placeholder="Filter Value"
+                  />
+                )}
+                onChange={(event, values) => {
+                  setMultiEntryValue(values);
+                }}
+              />
+            </FormControl>
           );
         case "multiEntryFreeSolo":
           return (
-            <Autocomplete
-              multiple
-              id="multiEntryFreeSolo"
-              options={getTextBoxOptions()}
-              freeSolo
-              sx={{ m: 1, minWidth: 250 }}
-              renderTags={(value, getTagProps) =>
-                value.map((option, index) => (
-                  <Chip
-                    variant="outlined"
-                    label={option}
-                    {...getTagProps({ index })}
+            <FormControl sx={{ m: 1, minWidth: 250 }}>
+              <Autocomplete
+                multiple
+                id="multiEntryFreeSolo"
+                options={getTextBoxOptions()}
+                freeSolo
+                renderTags={(value, getTagProps) =>
+                  value.map((option, index) => (
+                    <Chip
+                      variant="outlined"
+                      label={option}
+                      {...getTagProps({ index })}
+                    />
+                  ))
+                }
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Value"
+                    placeholder="Filter Value"
                   />
-                ))
-              }
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Value"
-                  placeholder="Filter Value"
-                />
-              )}
-            />
+                )}
+                onChange={(event, values) => {
+                  setMultiEntryValue(values);
+                }}
+              />
+            </FormControl>
           );
         case "datePicker":
           return (
-            <div style={{ padding: 8}}>
+            <FormControl sx={{ m: 1, minWidth: 150 }}>
               <LocalizationProvider dateAdapter={AdapterDateFns}>
                 <DatePicker
                   label="Date"
-                  value={value}
-                  onChange={(newValue) => {
-                    setValue(newValue);
+                  value={filterDate}
+                  inputFormat="dd/MM/yyyy"
+                  onChange={(newDate) => {
+                    setFilterDate(newDate);
                   }}
-                  sx={{ m: 1, minWidth: 50 }}
                   renderInput={(params) => <TextField {...params} />}
                 />
               </LocalizationProvider>
-            </div>
+            </FormControl>
           );
         case "twoDatePicker":
-          break;
+          return (
+            <LocalizationProvider dateAdapter={AdapterDateFns}>
+              <FormControl sx={{ m: 1, minWidth: 100 }}>
+                <DatePicker
+                  label="Start"
+                  value={filterStartDate}
+                  onChange={(newDate) => {
+                    setFilterStartDate(newDate);
+                  }}
+                  renderInput={(params) => <TextField {...params} />}
+                />
+              </FormControl>
+              <FormControl sx={{ m: 1, minWidth: 100 }}>
+                <DatePicker
+                  label="End"
+                  value={filterEndDate}
+                  onChange={(newDate) => {
+                    setFilterEndDate(newDate);
+                  }}
+                  renderInput={(params) => <TextField {...params} />}
+                />
+              </FormControl>
+            </LocalizationProvider>
+          );
         case "numOnlyTextBox":
-          break;
+          return (
+            <FormControl sx={{ m: 1, minWidth: 150 }}>
+              <TextField
+                id="numOnlyTextBox"
+                label="Value"
+                placeholder="Filter Value"
+                variant="outlined"
+                type="number"
+                onChange={(event) => {
+                  setNumberValue(event.target.value);
+                }}
+              />
+            </FormControl>
+          );
         default:
           return <></>;
       }
@@ -226,10 +274,11 @@ export default function FilterDialog(props) {
     setDialogOpen(props.dialogOpen);
     getDataType();
     getConditionOptions();
-    console.log("column selected: " + columnSelected);
-    console.log("condition selected: " + conditionSelected);
+    // console.log("column selected: " + columnSelected);
+    // console.log("condition selected: " + conditionSelected);
     let textBoxToRender = getRenderOption();
     setRenderSelected(textBoxToRender);
+    console.log(data)
   });
 
   return (
@@ -299,7 +348,8 @@ export default function FilterDialog(props) {
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleCloseDialog}>Close</Button>
+        <Button>ADD FILTER</Button>
+        <Button onClick={handleCloseDialog}>CLOSE</Button>
       </DialogActions>
     </Dialog>
   );

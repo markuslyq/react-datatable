@@ -23,19 +23,33 @@ const isJSON = (stringToCheck) => {
 const parseToArray = (result) => {
   for (let i = 0; i < result.length; i++) {
     for (let key in result[i]) {
-      // console.log(key + " is " + typeof result[i][key]);
-      if (typeof result[i][key] === "string") {
-        let str = result[i][key];
-        if (str != null) {
-          if (isArray(str) || isJSON(str)) {
-            result[i][key] = JSON.parse(result[i][key]);
+      let value = result[i][key];
+      if (value !== null) {
+        if (typeof result[i][key] === "string") {
+          let str = result[i][key];
+          if (str != null) {
+            if (isArray(str)) {
+              result[i][key] = JSON.parse(str);
+              // console.log(result[i][key]);
+              result[i][key].map((val) => {
+                if (val === null || val === "") {
+                  val = ["--"];
+                }
+              });
+            } else if (isJSON(str)) {
+              result[i][key] = JSON.parse(str);
+            }
           }
         }
+      } else {
+        result[i][key] = ["--"];
       }
     }
   }
   return result;
 };
+
+const processData = (data) => {};
 
 const db = mysql.createConnection({
   user: "root",
@@ -91,10 +105,9 @@ app.get("/get", (req, res) => {
       ) AS company`,
     (err, result) => {
       if (!err) {
-        // console.log(result[1].user_id);
         dataSet = parseToArray(result);
         res.send(dataSet);
-        // console.log(dataSet);
+        console.log(dataSet);
       } else {
         console.log(err);
       }
