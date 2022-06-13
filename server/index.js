@@ -28,22 +28,24 @@ const parseToArray = (result) => {
         if (typeof result[i][key] === "string") {
           let str = result[i][key];
           if (str != null) {
+            // Check if string is an array
             if (isArray(str)) {
               result[i][key] = JSON.parse(str);
-              // console.log(result[i][key]);
-              result[i][key].map((val) => {
-                if (val === null || val === "") {
-                  val = ["--"];
-                }
-              });
+              // result[i][key].map((val) => {
+              //   if (val === null || val === "") {
+              //     val = ["--"];
+              //   }
+              // });
             } else if (isJSON(str)) {
+              //Checks if string is an JSON object
               result[i][key] = JSON.parse(str);
             }
           }
         }
-      } else {
-        result[i][key] = ["--"];
-      }
+      } 
+      // else {
+      //   result[i][key] = ["--"];
+      // }
     }
   }
   return result;
