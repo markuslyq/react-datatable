@@ -20,7 +20,23 @@ const isJSON = (stringToCheck) => {
   return false;
 };
 
-const parseToArray = (result) => {
+const processJSONObj = (obj) => {
+  for (let key in obj) {
+    let value = obj[key];
+    if (value !== null) {
+      for (let i = 0; i < value.length; i++) {
+        let val = obj[key][i];
+        if (val === null || val === "") {
+          obj[key][i] = "--";
+        }
+      }
+    } else {
+      obj[key] = ["--"];
+    }
+  }
+};
+
+const processData = (result) => {
   for (let i = 0; i < result.length; i++) {
     for (let key in result[i]) {
       let value = result[i][key];
@@ -31,27 +47,25 @@ const parseToArray = (result) => {
             // Check if string is an array
             if (isArray(str)) {
               result[i][key] = JSON.parse(str);
-              // result[i][key].map((val) => {
-              //   if (val === null || val === "") {
-              //     val = ["--"];
-              //   }
-              // });
+              result[i][key].map((val) => {
+                if (val === null || val === "") {
+                  val = "--";
+                }
+              });
             } else if (isJSON(str)) {
               //Checks if string is an JSON object
               result[i][key] = JSON.parse(str);
+              processJSONObj(result[i][key]);
             }
           }
         }
-      } 
-      // else {
-      //   result[i][key] = ["--"];
-      // }
+      } else {
+        result[i][key] = ["--"];
+      }
     }
   }
   return result;
 };
-
-const processData = (data) => {};
 
 const db = mysql.createConnection({
   user: "root",
@@ -107,9 +121,8 @@ app.get("/get", (req, res) => {
       ) AS company`,
     (err, result) => {
       if (!err) {
-        dataSet = parseToArray(result);
+        dataSet = processData(result);
         res.send(dataSet);
-        console.log(dataSet);
       } else {
         console.log(err);
       }

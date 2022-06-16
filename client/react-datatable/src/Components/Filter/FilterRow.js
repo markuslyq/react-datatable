@@ -1,18 +1,10 @@
 import React, { useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import {
   Box,
-  Button,
-  ButtonGroup,
   Grid,
   IconButton,
-  Tooltip,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
   FormControl,
-  FormControlLabel,
   InputLabel,
   MenuItem,
   Select,
@@ -23,10 +15,23 @@ import {
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import FilterListIcon from "@mui/icons-material/FilterList";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
+import { setDayOfYear } from "date-fns";
+import {
+  setFilterCount,
+  pushFilterObjArr,
+  setDeleteFilterRowIndex,
+} from "./filterSlice";
 
 export default function FilterRow(props) {
+  const dispatch = useDispatch();
+
+  const filterCount = useSelector((state) => state.filter.filterCount);
+  const isFilterAppliedClicked = useSelector(
+    (state) => state.filter.isFilterAppliedClicked
+  );
+  // const filterObj = useSelector((state) => state.filter.filterObjArr[props.id]);
+
   const [dataType, setDataType] = useState(null);
   const [columnSelected, setColumnSelected] = useState("");
   const [conditionSelected, setConditionSelected] = useState("");
@@ -38,12 +43,18 @@ export default function FilterRow(props) {
   const [filterEndDate, setFilterEndDate] = useState(null);
   const [numberValue, setNumberValue] = useState(null);
 
-  const [filterCount, setFilterCount] = useState(props.filterCount);
+  // const [filterValue, setFilterValue] = useState(null);
 
+  const id = props.id;
   const columns = props.columns;
   const data = props.data;
 
   const filterCriteria = [
+    {
+      dataType: "id",
+      conditionOptions: ["EQUAL"],
+      renderOptions: ["numOnlyMultiEntry"],
+    },
     {
       dataType: "string",
       conditionOptions: ["EQUAL", "NOT EQUAL", "CONTAIN"],
@@ -56,18 +67,22 @@ export default function FilterRow(props) {
     },
     {
       dataType: "number",
-      conditionOptions: ["EQUALS", "LESS THAN", "MORE THAN"],
-      renderOptions: ["numOnlyTextBox", "numOnlyTextBox", "numOnlyTextBox"],
+      conditionOptions: ["EQUAL", "LESS THAN", "MORE THAN"],
+      renderOptions: ["numOnlyMultiEntry", "numOnlyTextBox", "numOnlyTextBox"],
     },
     {
       dataType: "array",
-      conditionOptions: ["IN LIST", "NOT IN LIST", "LIST NOT EQUAL", "CONTAIN"],
-      renderOptions: ["multiEntry", "multiEntry", "multiEntry", "multiEntry"],
+      // conditionOptions: ["IN LIST", "NOT IN LIST", "LIST NOT EQUAL", "CONTAIN"],
+      // renderOptions: ["multiEntry", "multiEntry", "multiEntry", "multiEntry"],
+      conditionOptions: ["IN LIST", "NOT IN LIST", "LIST NOT EQUAL"],
+      renderOptions: ["multiEntry", "multiEntry", "multiEntry"],
     },
     {
-      dataType: "object",
-      conditionOptions: ["IN LIST", "NOT IN LIST", "LIST NOT EQUAL", "CONTAIN"],
-      renderOptions: ["multiEntry", "multiEntry", "multiEntry", "multiEntry"],
+      dataType: "group",
+      // conditionOptions: ["IN LIST", "NOT IN LIST", "LIST NOT EQUAL", "CONTAIN"],
+      // renderOptions: ["multiEntry", "multiEntry", "multiEntry", "multiEntry"],
+      conditionOptions: ["IN LIST", "NOT IN LIST", "LIST NOT EQUAL"],
+      renderOptions: ["multiEntry", "multiEntry", "multiEntry"],
     },
   ];
 
@@ -102,6 +117,28 @@ export default function FilterRow(props) {
     return "";
   };
 
+  const getFilterValues = () => {
+    if (dataType && conditionSelected) {
+      switch (renderSelected) {
+        case "multiEntry":
+        case "multiEntryFreeSolo":
+        case "numOnlyMultiEntry":
+          return multiEntryValue;
+        case "datePicker":
+          return filterDate;
+        case "twoDatePicker":
+          return {
+            filterStartDate: filterStartDate,
+            filterEndDate: filterEndDate,
+          };
+        case "numOnlyTextBox":
+          return numberValue;
+        default:
+          return "--";
+      }
+    }
+  };
+
   const getTextBoxOptions = () => {
     let textBoxOptions = new Set();
     if (dataType && conditionSelected) {
@@ -110,38 +147,44 @@ export default function FilterRow(props) {
         let columnNameSplit = columnSelected.split(".");
         if (columnNameSplit.length === 2) {
           let selectedColVals = dataObj[columnNameSplit[0]][columnNameSplit[1]];
-          if (selectedColVals === null) {
-            textBoxOptions.add("--");
-          } else if (selectedColVals === "") {
-            textBoxOptions.add("-");
-          } else {
-            selectedColVals.map((subHeaderValues) =>
-              textBoxOptions.add(subHeaderValues)
-            );
-          }
+          // if (selectedColVals === null) {
+          //   textBoxOptions.add("--");
+          // } else if (selectedColVals === "") {
+          //   textBoxOptions.add("-");
+          // } else {
+          selectedColVals.map((subHeaderValues) => {
+            if (subHeaderValues === null) {
+              textBoxOptions.add("--");
+            } else if (subHeaderValues === "") {
+              textBoxOptions.add("-");
+            } else {
+              textBoxOptions.add(subHeaderValues.toString());
+            }
+          });
+          // }
         } else {
           let selectedColVals = dataObj[columnSelected];
           if (selectedColVals !== null && Array.isArray(selectedColVals)) {
             selectedColVals.map((colVal) => {
-              if (colVal === null) {
-                textBoxOptions.add("--");
-              } else if (colVal === "") {
-                textBoxOptions.add("-");
-              } else {
-                textBoxOptions.add(colVal);
-              }
+              // if (colVal === null) {
+              //   textBoxOptions.add("--");
+              // } else if (colVal === "") {
+              //   textBoxOptions.add("-");
+              // } else {
+              textBoxOptions.add(colVal.toString());
+              // }
             });
-          } else if (selectedColVals === null) {
-            textBoxOptions.add("--");
-          } else if (selectedColVals === "") {
-            textBoxOptions.add("-");
+            // } else if (selectedColVals === null) {
+            //   textBoxOptions.add("--");
+            // } else if (selectedColVals === "") {
+            //   textBoxOptions.add("-");
           } else {
-            textBoxOptions.add(selectedColVals);
+            textBoxOptions.add(selectedColVals.toString());
           }
         }
       }
     }
-    return Array.from(textBoxOptions);
+    return Array.from(textBoxOptions).sort();
   };
 
   const renderTextBox = () => {
@@ -152,7 +195,7 @@ export default function FilterRow(props) {
             <FormControl sx={{ m: 1, minWidth: 250 }}>
               <Autocomplete
                 multiple
-                id={dataType + " multiEntry"}
+                id={dataType + "-multiEntry"}
                 options={getTextBoxOptions()}
                 filterSelectedOptions
                 renderInput={(params) => (
@@ -221,6 +264,7 @@ export default function FilterRow(props) {
                 <DatePicker
                   label="Start"
                   value={filterStartDate}
+                  inputFormat="dd/MM/yyyy"
                   onChange={(newDate) => {
                     setFilterStartDate(newDate);
                   }}
@@ -231,6 +275,7 @@ export default function FilterRow(props) {
                 <DatePicker
                   label="End"
                   value={filterEndDate}
+                  inputFormat="dd/MM/yyyy"
                   onChange={(newDate) => {
                     setFilterEndDate(newDate);
                   }}
@@ -254,6 +299,28 @@ export default function FilterRow(props) {
               />
             </FormControl>
           );
+        case "numOnlyMultiEntry":
+          return (
+            <FormControl sx={{ m: 1, minWidth: 250 }}>
+              <Autocomplete
+                multiple
+                id={dataType + "-multiEntry"}
+                options={getTextBoxOptions()}
+                filterSelectedOptions
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Value"
+                    placeholder="Filter Value"
+                    type="number"
+                  />
+                )}
+                onChange={(event, values) => {
+                  setMultiEntryValue(values);
+                }}
+              />
+            </FormControl>
+          );
         default:
           return <></>;
       }
@@ -270,19 +337,24 @@ export default function FilterRow(props) {
   };
 
   const handleRemoveFilterRow = () => {
-    if (filterCount >= 1) {
-      let newFilterCount = filterCount;
-      newFilterCount -= 1;
-      props.updateFilterCount(newFilterCount);
-    }
+    dispatch(setDeleteFilterRowIndex(id));
   };
 
   useEffect(() => {
+    console.log(props.id + ":");
     getDataType();
     getConditionOptions();
     let textBoxToRender = getRenderOption();
     setRenderSelected(textBoxToRender);
-    console.log(data);
+    getFilterValues();
+    if (isFilterAppliedClicked) {
+      let filterObj = {
+        column: columnSelected,
+        condition: conditionSelected,
+        value: getFilterValues(),
+      };
+      dispatch(pushFilterObjArr(filterObj));
+    }
   });
 
   return (
@@ -299,6 +371,7 @@ export default function FilterRow(props) {
             justifyContent: "center",
           }}
         >
+          {/* Column Select Option Box */}
           <FormControl sx={{ m: 1, minWidth: 120 }}>
             <InputLabel>Column</InputLabel>
             <Select
@@ -312,7 +385,7 @@ export default function FilterRow(props) {
               }}
             >
               {columns.map((col) =>
-                col.dataType === "object" ? (
+                col.dataType === "group" ? (
                   col.subHeaders.map((subHeader) => (
                     <MenuItem value={col.name + "." + subHeader.toLowerCase()}>
                       {col.label + " - " + subHeader}
@@ -324,6 +397,8 @@ export default function FilterRow(props) {
               )}
             </Select>
           </FormControl>
+
+          {/* Condition Select Option Box */}
           <FormControl sx={{ m: 1, minWidth: 150 }}>
             <InputLabel>Condition</InputLabel>
             <Select
@@ -343,6 +418,8 @@ export default function FilterRow(props) {
           {renderTextBox()}
         </Box>
       </Grid>
+
+      {/* Remove Filter Row Icon */}
       <Grid item xs={1}>
         <FormControl sx={{ mt: 2, minWidth: 150 }}>
           <IconButton>

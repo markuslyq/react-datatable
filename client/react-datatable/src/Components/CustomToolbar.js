@@ -1,25 +1,19 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { useSelector, useDispatch } from 'react-redux';
 import { IconButton, Tooltip } from "@mui/material";
 import FilterListIcon from "@mui/icons-material/FilterList";
-import FilterDialog from "./FilterDialog";
+import FilterDialog from "./Filter/FilterDialog";
+import { openFilterDialog } from "./Filter/filterSlice";
 
 export default function CustomToolbar(props) {
-  const [dialogOpen, setDialogOpen] = React.useState(false);
-  const [columnSelected, setColumnSelected] = React.useState("");
+  const dispatch = useDispatch();
 
   const columns = props.columns;
+  const data = props.data;
 
   const handleClick = () => {
     console.log("Filter icon pressed!");
-    handleOpenDialog();
-  };
-
-  const handleOpenDialog = () => {
-    setDialogOpen(true);
-  };
-
-  const handleCloseDialog = () => {
-    setDialogOpen(false);
+    dispatch(openFilterDialog());
   };
 
   return (
@@ -30,10 +24,8 @@ export default function CustomToolbar(props) {
         </IconButton>
       </Tooltip>
       <FilterDialog
-        dialogOpen={dialogOpen}
         columns={columns}
-        data={props.data}
-        updateDialogStatus={setDialogOpen}
+        data={data}
       />
     </React.Fragment>
   );

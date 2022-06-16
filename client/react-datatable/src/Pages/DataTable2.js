@@ -27,7 +27,8 @@ function capitalizeFirstLetter(str) {
   return capitalized;
 }
 
-function getSubHeaders(subHeaderObj) {
+function getSubHeaders(dataToProcess, key) {
+  let subHeaderObj = dataToProcess[0][key];
   let subHeaders = [];
   for (let key in subHeaderObj) {
     key = capitalizeFirstLetter(key);
@@ -37,32 +38,12 @@ function getSubHeaders(subHeaderObj) {
   return subHeaders;
 }
 
-function getDataType(data, key) {
-  for (let i = 0; i < data.length; i++) {
-    let variable = data[i][key];
-    if (variable !== null) {
-      if (typeof variable === "object") {
-        //Return "Array" if object is an array
-        if (Array.isArray(variable)) {
-          return "array";
-        }
-        //Return "Date" if object is a Date Object
-        if (variable instanceof Date) {
-          return "date";
-        }
-        return getSubHeaders(variable);
-      }
-      return typeof variable;
-    }
-  }
-  return null;
-}
-
 function DataTable2() {
   const columnsDetails = [
     {
       name: "user_id",
       label: "User ID",
+      dataType: "id",
       options: {
         filter: false,
         display: false,
@@ -71,6 +52,7 @@ function DataTable2() {
     {
       name: "name",
       label: "Name",
+      dataType: "string",
       options: {
         filter: true,
         sortThirdClickReset: true,
@@ -80,6 +62,7 @@ function DataTable2() {
     {
       name: "phone",
       label: "Phone",
+      dataType: "string",
       options: {
         print: false,
         filter: true,
@@ -90,6 +73,7 @@ function DataTable2() {
     {
       name: "email",
       label: "Email",
+      dataType: "string",
       options: {
         filter: false,
         print: false,
@@ -100,6 +84,7 @@ function DataTable2() {
     {
       name: "start_date",
       label: "Start Date",
+      dataType: "date",
       options: {
         filter: false,
         sortThirdClickReset: true,
@@ -116,6 +101,7 @@ function DataTable2() {
     {
       name: "end_date",
       label: "End Date",
+      dataType: "date",
       options: {
         filter: false,
         sortThirdClickReset: true,
@@ -132,6 +118,7 @@ function DataTable2() {
     {
       name: "deadline",
       label: "Deadline",
+      dataType: "date",
       options: {
         filter: false,
         sortThirdClickReset: true,
@@ -148,6 +135,7 @@ function DataTable2() {
     {
       name: "postal_code",
       label: "Postal Zip",
+      dataType: "string",
       options: {
         filter: false,
         sortThirdClickReset: true,
@@ -157,6 +145,7 @@ function DataTable2() {
     {
       name: "country",
       label: "Country",
+      dataType: "string",
       options: {
         filter: false,
         sortThirdClickReset: true,
@@ -166,6 +155,7 @@ function DataTable2() {
     {
       name: "age",
       label: "Age",
+      dataType: "number",
       options: {
         filter: false,
         sortThirdClickReset: true,
@@ -175,57 +165,59 @@ function DataTable2() {
     {
       name: "cars",
       label: "Cars",
+      dataType: "array",
       options: {
         filter: false,
         sort: false,
         setCellProps: () => ({ style: styles.regularTableCell }),
         customBodyRender: (value, tableMeta, updateValue) => {
           let maxHeight = getMaxHeight(tableMeta.rowData);
-          if (value != null) {
-            return (
-              <Table sx={{ minWidth: "max-content", height: maxHeight + 10 }}>
-                <TableBody>
-                  {value.map((val, key) => {
-                    return (
-                      <TableRow key={key}>
-                        <TableCell
-                          sx={styles.innerTableCell}
-                          align="left"
-                          key={key}
-                          component={Paper}
-                        >
-                          {val ? val : "-"}
-                        </TableCell>
-                      </TableRow>
-                      // <Chip label={val} key={key} />
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            );
-          } else {
-            return (
-              <Table sx={{ minWidth: "max-content", height: maxHeight + 10 }}>
-                <TableBody>
-                  <TableRow>
-                    <TableCell
-                      sx={styles.innerTableCell}
-                      align="left"
-                      component={Paper}
-                    >
-                      --
-                    </TableCell>
-                  </TableRow>
-                </TableBody>
-              </Table>
-            );
-          }
+          // if (value != null) {
+          return (
+            <Table sx={{ minWidth: "max-content", height: maxHeight + 10 }}>
+              <TableBody>
+                {value.map((val, key) => {
+                  return (
+                    <TableRow key={key}>
+                      <TableCell
+                        sx={styles.innerTableCell}
+                        align="left"
+                        key={key}
+                        component={Paper}
+                      >
+                        {val ? val : "-"}
+                      </TableCell>
+                    </TableRow>
+                    // <Chip label={val} key={key} />
+                  );
+                })}
+              </TableBody>
+            </Table>
+          );
+          // } else {
+          //   return (
+          //     <Table sx={{ minWidth: "max-content", height: maxHeight + 10 }}>
+          //       <TableBody>
+          //         <TableRow>
+          //           <TableCell
+          //             sx={styles.innerTableCell}
+          //             align="left"
+          //             component={Paper}
+          //           >
+          //             --
+          //           </TableCell>
+          //         </TableRow>
+          //       </TableBody>
+          //     </Table>
+          //   );
+          // }
         },
       },
     },
     {
       name: "previous_company_info",
       label: "Previous Companies",
+      dataType: "group",
       options: {
         filter: false,
         sort: false,
@@ -241,6 +233,7 @@ function DataTable2() {
     {
       name: "password",
       label: "Password",
+      dataType: "string",
       options: {
         filter: false,
         sort: false,
@@ -250,33 +243,34 @@ function DataTable2() {
     {
       name: "notes",
       label: "Notes",
+      dataType: "string",
       options: {
         filter: false,
         sort: false,
         setCellProps: () => ({ style: styles.regularTableCell }),
         customBodyRender: (value, tableMeta, updateValue) => {
           let maxHeight = getMaxHeight(data[tableMeta.rowIndex]);
-          if (value != null) {
-            return (
-              <div
-                style={{
-                  width: "500px",
-                  height: maxHeight,
-                  overflow: "auto",
-                  padding: 0,
-                  margin: 0,
-                }}
-              >
-                {value}
-              </div>
-            );
-          } else {
-            return (
-              <div style={{ width: "500px", overflow: "auto", padding: 1 }}>
-                --
-              </div>
-            );
-          }
+          // if (value != null) {
+          return (
+            <div
+              style={{
+                width: "500px",
+                height: maxHeight,
+                overflow: "auto",
+                padding: 0,
+                margin: 0,
+              }}
+            >
+              {value}
+            </div>
+          );
+          // } else {
+          //   return (
+          //     <div style={{ width: "500px", overflow: "auto", padding: 1 }}>
+          //       --
+          //     </div>
+          //   );
+          // }
         },
       },
     },
@@ -305,12 +299,10 @@ function DataTable2() {
     return dataToProcess;
   };
 
-  const addDataType = (cols, dataToProcess) => {
+  const addSubHeaders = (cols, dataToProcess) => {
     for (let i = 0; i < cols.length; i++) {
-      cols[i]["dataType"] = getDataType(dataToProcess, cols[i].name);
-      if (Array.isArray(cols[i]["dataType"])) {
-        cols[i]["subHeaders"] = cols[i]["dataType"];
-        cols[i]["dataType"] = "object";
+      if (cols[i]["dataType"] === "group") {
+        cols[i]["subHeaders"] = getSubHeaders(dataToProcess, cols[i].name);
       }
     }
     return cols;
@@ -366,13 +358,12 @@ function DataTable2() {
       console.log(response);
       response.data = processDate(response.data);
       setData(response.data);
-      let columnsInfo = addDataType(columnsDetails, response.data);
+      let columnsInfo = addSubHeaders(columnsDetails, response.data);
       setColumns(columnsInfo);
-      console.log(columns);
     });
   };
 
-  function renderSubBody(value, tableMeta) {
+  const renderSubBody = (value, tableMeta) => {
     let subKeys = [];
     for (let key in value) {
       subKeys.push(key);
@@ -389,6 +380,7 @@ function DataTable2() {
                 {subKeys.map((subKey) => {
                   return (
                     <TableCell
+                      key = {subKey}
                       style={{
                         padding: 10,
                         width: "10em",
@@ -396,11 +388,7 @@ function DataTable2() {
                       }}
                       component={Paper}
                     >
-                      {row[subKey] === null
-                        ? "--"
-                        : row[subKey] === ""
-                        ? "-"
-                        : row[subKey]}
+                      {row[subKey]}
                     </TableCell>
                   );
                 })}
@@ -410,19 +398,14 @@ function DataTable2() {
         </TableBody>
       </Table>
     );
-  }
+  };
 
-  function renderSubHeader(columnMeta) {
+  const renderSubHeader = (columnMeta) => {
     let columnIndex = columnMeta.index;
     let subHeaders = [];
     if ("subHeaders" in columns[columnIndex]) {
       subHeaders = columns[columnIndex]["subHeaders"];
     }
-    // if (data.length !== 0) {
-    //   let subHeaderObj = data[0][columnName];
-    //   subHeaders = getSubHeaders(subHeaderObj);
-    //   console.log("subHeaders: " + subHeaders);
-    // }
     return (
       <th>
         <TableRow style={styles.multiValueMainHeader}>
@@ -430,14 +413,14 @@ function DataTable2() {
         </TableRow>
         <TableRow>
           {subHeaders.map((subHeader) => (
-            <TableCell style={styles.multiValueSubHeader}>
+            <TableCell key={subHeader} style={styles.multiValueSubHeader}>
               {subHeader}
             </TableCell>
           ))}
         </TableRow>
       </th>
     );
-  }
+  };
 
   useEffect(() => {
     console.log("Current Page: DataTable");
