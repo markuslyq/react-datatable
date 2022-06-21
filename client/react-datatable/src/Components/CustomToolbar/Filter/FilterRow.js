@@ -11,12 +11,12 @@ import {
   Autocomplete,
   TextField,
   Chip,
+  Tooltip,
 } from "@mui/material";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
-import { setDayOfYear } from "date-fns";
 import {
   setFilterCount,
   pushFilterObjArr,
@@ -30,18 +30,55 @@ export default function FilterRow(props) {
   const isFilterAppliedClicked = useSelector(
     (state) => state.filter.isFilterAppliedClicked
   );
-  // const filterObj = useSelector((state) => state.filter.filterObjArr[props.id]);
+  const filterObj = useSelector((state) => state.filter.filterObjArr[props.id]);
 
   const [dataType, setDataType] = useState(null);
-  const [columnSelected, setColumnSelected] = useState("");
-  const [conditionSelected, setConditionSelected] = useState("");
   const [renderSelected, setRenderSelected] = useState("");
 
-  const [multiEntryValue, setMultiEntryValue] = useState(null);
-  const [filterDate, setFilterDate] = useState(null);
-  const [filterStartDate, setFilterStartDate] = useState(null);
-  const [filterEndDate, setFilterEndDate] = useState(null);
-  const [numberValue, setNumberValue] = useState(null);
+  const [columnSelected, setColumnSelected] = useState(
+    filterObj ? filterObj.column : ""
+  );
+  const [conditionSelected, setConditionSelected] = useState(
+    filterObj ? filterObj.condition : ""
+  );
+
+  const [multiEntryValue, setMultiEntryValue] = useState(
+    filterObj ? (Array.isArray(filterObj.value) ? filterObj.value : null) : null
+  );
+
+  const [filterDate, setFilterDate] = useState(
+    filterObj
+      ? filterObj.value instanceof Date
+        ? filterObj.value
+        : null
+      : null
+  );
+
+  const [filterStartDate, setFilterStartDate] = useState(
+    filterObj
+      ? typeof filterObj.value === "object" &&
+        !Array.isArray(filterObj.value) &&
+        filterObj.value !== null
+        ? filterObj.value.filterStartDate
+        : null
+      : null
+  );
+  const [filterEndDate, setFilterEndDate] = useState(
+    filterObj
+      ? typeof filterObj.value === "object" &&
+        !Array.isArray(filterObj.value) &&
+        filterObj.value !== null
+        ? filterObj.value.filterEndDate
+        : null
+      : null
+  );
+  const [numberValue, setNumberValue] = useState(
+    filterObj
+      ? !isNaN(filterObj.value) && !Array.isArray(filterObj.value)
+        ? filterObj.value
+        : null
+      : null
+  );
 
   // const [filterValue, setFilterValue] = useState(null);
 
@@ -72,17 +109,23 @@ export default function FilterRow(props) {
     },
     {
       dataType: "array",
-      // conditionOptions: ["IN LIST", "NOT IN LIST", "LIST NOT EQUAL", "CONTAIN"],
-      // renderOptions: ["multiEntry", "multiEntry", "multiEntry", "multiEntry"],
-      conditionOptions: ["IN LIST", "NOT IN LIST", "LIST NOT EQUAL"],
-      renderOptions: ["multiEntry", "multiEntry", "multiEntry"],
+      conditionOptions: ["IN LIST", "NOT IN LIST", "LIST NOT EQUAL", "CONTAIN"],
+      renderOptions: [
+        "multiEntry",
+        "multiEntry",
+        "multiEntry",
+        "multiEntryFreeSolo",
+      ],
     },
     {
       dataType: "group",
-      // conditionOptions: ["IN LIST", "NOT IN LIST", "LIST NOT EQUAL", "CONTAIN"],
-      // renderOptions: ["multiEntry", "multiEntry", "multiEntry", "multiEntry"],
-      conditionOptions: ["IN LIST", "NOT IN LIST", "LIST NOT EQUAL"],
-      renderOptions: ["multiEntry", "multiEntry", "multiEntry"],
+      conditionOptions: ["IN LIST", "NOT IN LIST", "LIST NOT EQUAL", "CONTAIN"],
+      renderOptions: [
+        "multiEntry",
+        "multiEntry",
+        "multiEntry",
+        "multiEntryFreeSolo",
+      ],
     },
   ];
 
@@ -153,13 +196,13 @@ export default function FilterRow(props) {
           //   textBoxOptions.add("-");
           // } else {
           selectedColVals.map((subHeaderValues) => {
-            if (subHeaderValues === null) {
-              textBoxOptions.add("--");
-            } else if (subHeaderValues === "") {
-              textBoxOptions.add("-");
-            } else {
-              textBoxOptions.add(subHeaderValues.toString());
-            }
+            // if (subHeaderValues === null) {
+            //   textBoxOptions.add("--");
+            // } else if (subHeaderValues === "") {
+            //   textBoxOptions.add("-");
+            // } else {
+            textBoxOptions.add(subHeaderValues);
+            // }
           });
           // }
         } else {
@@ -171,7 +214,7 @@ export default function FilterRow(props) {
               // } else if (colVal === "") {
               //   textBoxOptions.add("-");
               // } else {
-              textBoxOptions.add(colVal.toString());
+              textBoxOptions.add(colVal);
               // }
             });
             // } else if (selectedColVals === null) {
@@ -179,12 +222,18 @@ export default function FilterRow(props) {
             // } else if (selectedColVals === "") {
             //   textBoxOptions.add("-");
           } else {
-            textBoxOptions.add(selectedColVals.toString());
+            textBoxOptions.add(selectedColVals);
           }
         }
       }
     }
-    return Array.from(textBoxOptions).sort();
+    let formattedOptions = Array.from(textBoxOptions);
+    if (typeof formattedOptions[0] === "number") {
+      return formattedOptions.map(String).sort((a, b) => {
+        return a - b;
+      });
+    }
+    return formattedOptions.sort();
   };
 
   const renderTextBox = () => {
@@ -195,8 +244,10 @@ export default function FilterRow(props) {
             <FormControl sx={{ m: 1, minWidth: 250 }}>
               <Autocomplete
                 multiple
+                key={conditionSelected}
                 id={dataType + "-multiEntry"}
                 options={getTextBoxOptions()}
+                defaultValue={multiEntryValue === null ? [] : multiEntryValue}
                 filterSelectedOptions
                 renderInput={(params) => (
                   <TextField
@@ -216,8 +267,10 @@ export default function FilterRow(props) {
             <FormControl sx={{ m: 1, minWidth: 250 }}>
               <Autocomplete
                 multiple
+                key={conditionSelected}
                 id="multiEntryFreeSolo"
                 options={getTextBoxOptions()}
+                defaultValue={multiEntryValue === null ? [] : multiEntryValue}
                 freeSolo
                 renderTags={(value, getTagProps) =>
                   value.map((option, index) => (
@@ -288,9 +341,11 @@ export default function FilterRow(props) {
           return (
             <FormControl sx={{ m: 1, minWidth: 150 }}>
               <TextField
+                key={conditionSelected}
                 id="numOnlyTextBox"
                 label="Value"
                 placeholder="Filter Value"
+                defaultValue={numberValue === null ? "" : numberValue}
                 variant="outlined"
                 type="number"
                 onChange={(event) => {
@@ -304,8 +359,10 @@ export default function FilterRow(props) {
             <FormControl sx={{ m: 1, minWidth: 250 }}>
               <Autocomplete
                 multiple
+                key={conditionSelected}
                 id={dataType + "-multiEntry"}
                 options={getTextBoxOptions()}
+                defaultValue={multiEntryValue === null ? [] : multiEntryValue}
                 filterSelectedOptions
                 renderInput={(params) => (
                   <TextField
@@ -334,6 +391,11 @@ export default function FilterRow(props) {
 
   const handleConditionSelect = (event) => {
     setConditionSelected(event.target.value);
+    setMultiEntryValue(null);
+    setFilterDate(null);
+    setFilterStartDate(null);
+    setFilterEndDate(null);
+    setNumberValue(null);
   };
 
   const handleRemoveFilterRow = () => {
@@ -341,12 +403,10 @@ export default function FilterRow(props) {
   };
 
   useEffect(() => {
-    console.log(props.id + ":");
     getDataType();
     getConditionOptions();
     let textBoxToRender = getRenderOption();
     setRenderSelected(textBoxToRender);
-    getFilterValues();
     if (isFilterAppliedClicked) {
       let filterObj = {
         column: columnSelected,
@@ -422,9 +482,11 @@ export default function FilterRow(props) {
       {/* Remove Filter Row Icon */}
       <Grid item xs={1}>
         <FormControl sx={{ mt: 2, minWidth: 150 }}>
-          <IconButton>
-            <RemoveCircleOutlineIcon onClick={handleRemoveFilterRow} />
-          </IconButton>
+          <Tooltip title={"Remove Filter"}>
+            <IconButton>
+              <RemoveCircleOutlineIcon onClick={handleRemoveFilterRow} />
+            </IconButton>
+          </Tooltip>
         </FormControl>
       </Grid>
     </Grid>

@@ -9,6 +9,7 @@ const filterSlice = createSlice({
     filterCount: 0,
     filterObjArr: [],
     deleteFilterRowIndex: -1,
+    filteredData: [],
   },
   reducers: {
     openFilterDialog: (state) => {
@@ -24,7 +25,7 @@ const filterSlice = createSlice({
       state.isFilterAppliedClicked = action.payload;
     },
     setIsFilterApplied: (state, action) => {
-      state.isFilterAppliedClicked = action.payload;
+      state.isFilterApplied = action.payload;
     },
     clearFilterObjArr: (state) => {
       state.filterObjArr = [];
@@ -37,6 +38,9 @@ const filterSlice = createSlice({
     },
     deleteFilterObj: (state, action) => {
       state.filterObjArr.splice(action.payload, 1);
+    },
+    setFilteredData: (state, action) => {
+      state.filteredData = action.payload;
     },
   },
 });
@@ -51,6 +55,7 @@ export const {
   pushFilterObjArr,
   setDeleteFilterRowIndex,
   deleteFilterObj,
+  setFilteredData,
 } = filterSlice.actions;
 
 export default filterSlice.reducer;

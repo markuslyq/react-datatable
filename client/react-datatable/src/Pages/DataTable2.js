@@ -1,20 +1,17 @@
 import React, { useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import "../App.css";
 import MUIDataTable from "mui-datatables";
 import {
-  FormControlLabel,
-  Button,
-  Switch,
   Table,
-  TableHead,
   TableBody,
   TableCell,
   TableRow,
   Paper,
   IconButton,
 } from "@mui/material";
-import CustomToolbar from "../Components/CustomToolbar";
+import CustomToolbar from "../Components/CustomToolbar/CustomToolbar";
 
 import axios from "axios";
 
@@ -39,6 +36,9 @@ function getSubHeaders(dataToProcess, key) {
 }
 
 function DataTable2() {
+  const isFilterApplied = useSelector((state) => state.filter.isFilterApplied);
+  const filteredData = useSelector((state) => state.filter.filteredData);
+
   const columnsDetails = [
     {
       name: "user_id",
@@ -174,25 +174,33 @@ function DataTable2() {
           let maxHeight = getMaxHeight(tableMeta.rowData);
           // if (value != null) {
           return (
-            <Table sx={{ minWidth: "max-content", height: maxHeight + 10 }}>
-              <TableBody>
-                {value.map((val, key) => {
-                  return (
-                    <TableRow key={key}>
-                      <TableCell
-                        sx={styles.innerTableCell}
-                        align="left"
-                        key={key}
-                        component={Paper}
-                      >
-                        {val ? val : "-"}
-                      </TableCell>
-                    </TableRow>
-                    // <Chip label={val} key={key} />
-                  );
-                })}
-              </TableBody>
-            </Table>
+            <div>
+              <Table
+                sx={{
+                  minWidth: "120px",
+                  height: maxHeight + 10,
+                  overflowY: "auto",
+                }}
+              >
+                <TableBody>
+                  {value.map((val, key) => {
+                    return (
+                      <TableRow key={key}>
+                        <TableCell
+                          sx={styles.innerTableCell}
+                          align="left"
+                          key={key}
+                          component={Paper}
+                        >
+                          {val ? val : "-"}
+                        </TableCell>
+                      </TableRow>
+                      // <Chip label={val} key={key} />
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </div>
           );
           // } else {
           //   return (
@@ -236,7 +244,7 @@ function DataTable2() {
       dataType: "string",
       options: {
         filter: false,
-        sort: false,
+        sortThirdClickReset: true,
         setCellProps: () => ({ style: styles.regularTableCell }),
       },
     },
@@ -246,7 +254,7 @@ function DataTable2() {
       dataType: "string",
       options: {
         filter: false,
-        sort: false,
+        sortThirdClickReset: true,
         setCellProps: () => ({ style: styles.regularTableCell }),
         customBodyRender: (value, tableMeta, updateValue) => {
           let maxHeight = getMaxHeight(data[tableMeta.rowIndex]);
@@ -372,31 +380,33 @@ function DataTable2() {
     let rows = formatRows(value, subKeys);
     let maxHeight = getMaxHeight(data[tableMeta.rowIndex]);
     return (
-      <Table sx={{ height: maxHeight + 10 }}>
-        <TableBody>
-          {rows.map((row) => {
-            return (
-              <TableRow>
-                {subKeys.map((subKey) => {
-                  return (
-                    <TableCell
-                      key = {subKey}
-                      style={{
-                        padding: 10,
-                        width: "10em",
-                        textAlign: "Left",
-                      }}
-                      component={Paper}
-                    >
-                      {row[subKey]}
-                    </TableCell>
-                  );
-                })}
-              </TableRow>
-            );
-          })}
-        </TableBody>
-      </Table>
+      <div style={{ maxHeight: 100, overflowY: "auto" }}>
+        <Table sx={{ height: maxHeight + 10 }}>
+          <TableBody>
+            {rows.map((row) => {
+              return (
+                <TableRow>
+                  {subKeys.map((subKey) => {
+                    return (
+                      <TableCell
+                        key={subKey}
+                        style={{
+                          padding: 10,
+                          width: "10em",
+                          textAlign: "Left",
+                        }}
+                        component={Paper}
+                      >
+                        {row[subKey]}
+                      </TableCell>
+                    );
+                  })}
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+      </div>
     );
   };
 
@@ -451,7 +461,7 @@ function DataTable2() {
       borderBottom: "1px solid rgba(224, 224, 224, 1)",
     },
     multiValueMainHeader: {
-      cursor: "pointer",
+      cursor: "grab",
       fontFamily: "Roboto-Regular",
       fontWeight: 100,
       fontSize: "0.875rem",
@@ -462,7 +472,7 @@ function DataTable2() {
       justifyContent: "center",
     },
     multiValueSubHeader: {
-      cursor: "pointer",
+      cursor: "grab",
       minWidth: "10em",
       borderBottom: "0px",
       textAlign: "center",
@@ -540,7 +550,7 @@ function DataTable2() {
       <ThemeProvider theme={theme}>
         <MUIDataTable
           title={"Employee list"}
-          data={data}
+          data={isFilterApplied ? filteredData : data}
           columns={columns}
           options={options}
         />

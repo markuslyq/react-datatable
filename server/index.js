@@ -36,6 +36,14 @@ const processJSONObj = (obj) => {
   }
 };
 
+const processArray = (arr) => {
+  arr.map((val) => {
+    if (val === null || val === "") {
+      val = "--";
+    }
+  });
+};
+
 const processData = (result) => {
   for (let i = 0; i < result.length; i++) {
     for (let key in result[i]) {
@@ -47,11 +55,7 @@ const processData = (result) => {
             // Check if string is an array
             if (isArray(str)) {
               result[i][key] = JSON.parse(str);
-              result[i][key].map((val) => {
-                if (val === null || val === "") {
-                  val = "--";
-                }
-              });
+              processArray(result[i][key]);
             } else if (isJSON(str)) {
               //Checks if string is an JSON object
               result[i][key] = JSON.parse(str);

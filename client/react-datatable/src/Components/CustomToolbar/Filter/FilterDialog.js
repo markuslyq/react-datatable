@@ -19,9 +19,23 @@ import {
   setDeleteFilterRowIndex,
   pushFilterObjArr,
   deleteFilterObj,
+  setFilteredData,
 } from "./filterSlice";
 import { setDayOfYear } from "date-fns";
-import store from "../../store";
+import store from "../../../store";
+
+function areArraysEqual(array1, array2) {
+  if (array1.length === array2.length) {
+    return array1.every((element) => {
+      if (array2.includes(element)) {
+        return true;
+      }
+
+      return false;
+    });
+  }
+  return false;
+}
 
 export default function FilterDialog(props) {
   const dispatch = useDispatch();
@@ -43,6 +57,7 @@ export default function FilterDialog(props) {
 
   // const [isFilterApplied, setIsFilterApplied] = useState(false);
   const [filterRowArr, setFilterRowArr] = useState([]);
+  const [renderCount, setRenderCount] = useState(0);
 
   // const [filterObjArr, setFilterObjArr] = useState([]);
 
@@ -94,18 +109,27 @@ export default function FilterDialog(props) {
       case "CONTAIN":
         /*
         filterValue datatype: Array
+        Value of the selected column (dataRow[column]) datatype: Array || string
         For each data row, return true if value of the selected column CONTAINs one of the value in the filterValue array.
         (i.e. 'Markus' contains 'M' or 'Mark')
         Get those row which returns true.
         */
-        if (columnSplit.length === 2) {
-          return dataToFilter.filter((dataRow) => {
-            return dataRow[columnSplit[0]][columnSplit[1]].some((val) => {
-              return filterValue.includes(val);
-            });
-          });
-        }
         return dataToFilter.filter((dataRow) => {
+          if (columnSplit.length === 2) {
+            return filterValue.some((val) => {
+              return dataRow[columnSplit[0]][columnSplit[1]].some((variable) =>
+                variable.includes(val)
+              );
+            });
+          }
+          if (Array.isArray(dataRow[column])) {
+            return filterValue.some((val) => {
+              return dataRow[column].some((variable) => variable.includes(val));
+            });
+            // return dataRow[column].some((val) => {
+            //   return filterValue.includes(val);
+            // });
+          }
           return filterValue.some((val) =>
             dataRow[column].toString().includes(val)
           );
@@ -125,7 +149,10 @@ export default function FilterDialog(props) {
             dataRow[column] < filterValue.filterEndDate
           );
         });
-      case "ISEMPTY":
+      case "ISEMPTY": //no filterValue
+        return dataToFilter.filter((dataRow) => {
+          return dataRow[column] == "--";
+        });
         break;
       case "LESS THAN": //filterValue datatype is a number
         return dataToFilter.filter((dataRow) => {
@@ -138,24 +165,24 @@ export default function FilterDialog(props) {
       case "IN LIST":
         /*
         filterValue datatype: Array
-        value of the selected column (dataRow[column]) datatype: Array
+        Value of the selected column (dataRow[column]) datatype: Array
         For each data row, returns true if either one of the values in dataRow[column] exists in the filterValue array.
         */
         return dataToFilter.filter((dataRow) => {
           if (columnSplit.length === 2) {
-            return dataRow[columnSplit[0]][columnSplit[1]].some((val) => {
+            return dataRow[columnSplit[0]][columnSplit[1]].every((val) => {
               return filterValue.includes(val);
             });
           }
-          return dataRow[column].some((val) => {
+          return dataRow[column].every((val) => {
             return filterValue.includes(val);
           });
         });
       case "NOT IN LIST":
         /*
         filterValue datatype: Array
-        value of the selected column (dataRow[column]) datatype: Array
-        For each data row, returns true if either one of the values in dataRow[column] exists in the filterValue array.
+        Value of the selected column (dataRow[column]) datatype: Array
+        For each data row, returns false if either one of the values in dataRow[column] exist in the filterValue array.
         */
         return dataToFilter.filter((dataRow) => {
           let isNotInList = true;
@@ -175,7 +202,19 @@ export default function FilterDialog(props) {
           return isNotInList;
         });
       case "LIST NOT EQUAL":
-        break;
+        /* 
+        filterValue dataType: Array
+        Returns true if the list is not a direct match to the entered variables.
+        */
+        let variable = [];
+        return dataToFilter.filter((dataRow) => {
+          if (columnSplit.length === 2) {
+            variable = dataRow[columnSplit[0]][columnSplit[1]];
+          } else {
+            variable = dataRow[column];
+          }
+          return !areArraysEqual(variable, filterValue);
+        });
       default:
         return [];
     }
@@ -195,28 +234,36 @@ export default function FilterDialog(props) {
   };
 
   const handleCloseDialog = () => {
+    if (filterObjArr.length === 0) {
+      let newFilterRowArr = [
+        <FilterRow id={0} key={0} columns={columns} data={data} />,
+      ];
+      setFilterRowArr(newFilterRowArr);
+    } else {
+      let newFilterRowArr = [];
+      for (let i = 0; i < filterObjArr.length; i++) {
+        newFilterRowArr.push(
+          <FilterRow id={i} key={i} columns={columns} data={data} />
+        );
+      }
+      setFilterRowArr(newFilterRowArr);
+    }
+    setRenderCount(0);
     dispatch(closeFilterDialog());
   };
 
   const handleAddFilter = () => {
     let newFilterRowArr = filterRowArr;
     let index = filterRowArr.length;
-    // let filterObj = {
-    //   column: "",
-    //   condition: "",
-    //   value: "",
-    // };
-    // dispatch(pushFilterObjArr(filterObj));
-    filterRowArr.push(
+    newFilterRowArr.push(
       <FilterRow id={index} key={index} columns={columns} data={data} />
     );
-    setFilterRowArr(newFilterRowArr);
+    setFilterRowArr([...newFilterRowArr]);
   };
 
   const handleApplyFilter = () => {
     dispatch(clearFilterObjArr());
     dispatch(setIsFilterAppliedClicked(true));
-    dispatch(setFilterCount(filterRowArr.length));
     dispatch(closeFilterDialog());
   };
 
@@ -233,34 +280,28 @@ export default function FilterDialog(props) {
 
     //Generate initial filter row
     if (isFilterDialogOpen) {
-      if (filterRowArr.length === 0) {
-        console.log("ran");
-        let newFilterRowArr = [];
-        let index = filterRowArr.length;
-        newFilterRowArr.push(
-          <FilterRow id={index} key={index} columns={columns} data={data} />
-        );
-        setFilterRowArr(newFilterRowArr);
-        // } else {
-        //   console.log("ran");
-        //   let newFilterRowArr = [];
-        //   for (let i = 0; i < filterObjArr.length; i++) {
-        //     newFilterRowArr.push(
-        //       <FilterRow id={i} key={i} columns={columns} data={data} />
-
-        //     );
-        //   }
-        //   // let i = 0
-        //   // filterObjArr.forEach((filterObj) => {
-        //   //   console.log(filterObj);
-        //   //   newFilterRowArr.push(
-        //   //     <FilterRow id={i} key={i} columns={columns} data={data} />
-        //   //   );
-        //   //   i++;
-        //   // });
-        //   setFilterRowArr(newFilterRowArr);
-
-        // }
+      if (renderCount == 0) {
+        let latestFilterObjArr = store.getState().filter.filterObjArr;
+        if (filterRowArr.length === 0) {
+          let newFilterRowArr = [];
+          let index = filterRowArr.length;
+          newFilterRowArr.push(
+            <FilterRow id={index} key={index} columns={columns} data={data} />
+          );
+          setFilterRowArr(newFilterRowArr);
+        }
+        if (latestFilterObjArr.length > 0) {
+          let newFilterRowArr = [];
+          for (let i = 0; i < latestFilterObjArr.length; i++) {
+            newFilterRowArr.push(
+              <FilterRow id={i} key={i} columns={columns} data={data} />
+            );
+          }
+          setFilterRowArr(newFilterRowArr);
+        }
+        let newRenderCount = renderCount;
+        newRenderCount++;
+        setRenderCount(newRenderCount);
       }
     }
 
@@ -274,15 +315,21 @@ export default function FilterDialog(props) {
       let newFilterObjArr = store.getState().filter.filterObjArr;
       setFilterObjArr(newFilterObjArr);
       console.log("filteredData: ");
-      console.log(filterData(newFilterObjArr));
+      let filteredData = filterData(newFilterObjArr);
+      console.log(filteredData);
+      dispatch(setFilteredData(filteredData));
 
       let newFilterCount = newFilterObjArr.length;
       dispatch(setFilterCount(newFilterCount));
 
-      dispatch(setIsFilterApplied(true));
+      if (newFilterCount > 0) {
+        dispatch(setIsFilterApplied(true));
+      } else {
+        dispatch(setIsFilterApplied(false));
+      }
       dispatch(setIsFilterAppliedClicked(false));
     }
-  }, [isFilterDialogOpen, filterObjArr, deleteFilterRowIndex, filterRowArr]);
+  }, [isFilterDialogOpen, filterObjArr, deleteFilterRowIndex]);
 
   return (
     <Dialog
@@ -295,11 +342,7 @@ export default function FilterDialog(props) {
         <FilterListIcon sx={{ mr: 1 }} />
         Filters :
       </DialogTitle>
-      <DialogContent>
-        {filterRowArr.map((filterRow) => {
-          return filterRow;
-        })}
-      </DialogContent>
+      <DialogContent>{filterRowArr}</DialogContent>
       <DialogActions>
         <ButtonGroup variant="text">
           <Button onClick={handleAddFilter}>ADD FILTER</Button>
