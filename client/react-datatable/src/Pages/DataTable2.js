@@ -12,10 +12,12 @@ import {
   IconButton,
 } from "@mui/material";
 import CustomToolbar from "../Components/CustomToolbar/CustomToolbar";
+import { useLocation } from "react-router-dom";
 
 import axios from "axios";
 
 import { Link } from "react-router-dom";
+import { set } from "date-fns";
 
 function capitalizeFirstLetter(str) {
   // converting first letter to uppercase
@@ -47,6 +49,7 @@ function DataTable2() {
       options: {
         filter: false,
         display: false,
+        setCellProps: () => ({ style: styles.regularTableCell }),
       },
     },
     {
@@ -202,23 +205,6 @@ function DataTable2() {
               </Table>
             </div>
           );
-          // } else {
-          //   return (
-          //     <Table sx={{ minWidth: "max-content", height: maxHeight + 10 }}>
-          //       <TableBody>
-          //         <TableRow>
-          //           <TableCell
-          //             sx={styles.innerTableCell}
-          //             align="left"
-          //             component={Paper}
-          //           >
-          //             --
-          //           </TableCell>
-          //         </TableRow>
-          //       </TableBody>
-          //     </Table>
-          //   );
-          // }
         },
       },
     },
@@ -229,7 +215,7 @@ function DataTable2() {
       options: {
         filter: false,
         sort: false,
-        setCellProps: () => ({ style: { padding: 0 } }),
+        setCellProps: () => ({ style: styles.regularTableCell }),
         customHeadLabelRender: (columnMeta) => {
           return renderSubHeader(columnMeta);
         },
@@ -272,21 +258,28 @@ function DataTable2() {
               {value}
             </div>
           );
-          // } else {
-          //   return (
-          //     <div style={{ width: "500px", overflow: "auto", padding: 1 }}>
-          //       --
-          //     </div>
-          //   );
-          // }
         },
       },
     },
   ];
 
-  const [filterArrayFullMatch, setFilterArrayFullMatch] = useState(true);
+  const location = useLocation();
+  const { userID } = location.state;
+
   const [data, setData] = useState([]);
-  const [columns, setColumns] = useState(columnsDetails);
+  const [columns, setColumns] = useState(null);
+
+  const getDefaultColumnOrder = () => {
+    let colOrderArr = [];
+    // if (columns !== null) {
+    for (let i = 0; i < columnsDetails.length; i++) {
+      colOrderArr.push(i);
+      // }
+    }
+    return colOrderArr;
+  };
+
+  const [columnOrder, setcolumnOrder] = useState(null);
 
   const isIsoDate = (dateStr) => {
     if (!/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/.test(dateStr))
@@ -362,12 +355,33 @@ function DataTable2() {
   };
 
   const handleGet = () => {
-    axios.get("http://localhost:3001/get").then((response) => {
+    let dbColumnInfo = [];
+    //Get table configurations
+    axios
+      .get("http://localhost:3001/getTableSettings", {
+        params: {
+          userID: userID,
+          tableName: "Employee List",
+        },
+      })
+      .then((response) => {
+        console.log(response.data);
+        console.log(response.data[0].column_settings);
+        // dbColumnInfo = response.data[0].column_settings;
+        // setColumns(dbColumnInfo);
+        
+      });
+
+    //Get table data
+    axios.get("http://localhost:3001/getData").then((response) => {
       console.log(response);
       response.data = processDate(response.data);
       setData(response.data);
-      let columnsInfo = addSubHeaders(columnsDetails, response.data);
-      setColumns(columnsInfo);
+      if (dbColumnInfo.length === 0) {
+        let columnsInfo = addSubHeaders(columnsDetails, response.data);
+        setColumns(columnsInfo);
+      }
+      setcolumnOrder(getDefaultColumnOrder());
     });
   };
 
@@ -413,28 +427,34 @@ function DataTable2() {
   const renderSubHeader = (columnMeta) => {
     let columnIndex = columnMeta.index;
     let subHeaders = [];
-    if ("subHeaders" in columns[columnIndex]) {
-      subHeaders = columns[columnIndex]["subHeaders"];
+    if (columns !== null) {
+      if ("subHeaders" in columns[columnIndex]) {
+        subHeaders = columns[columnIndex]["subHeaders"];
+      }
+      return (
+        <th>
+          <TableRow style={styles.multiValueMainHeader}>
+            {columnMeta.label}
+          </TableRow>
+          <TableRow>
+            {subHeaders.map((subHeader) => (
+              <TableCell key={subHeader} style={styles.multiValueSubHeader}>
+                {subHeader}
+              </TableCell>
+            ))}
+          </TableRow>
+        </th>
+      );
     }
-    return (
-      <th>
-        <TableRow style={styles.multiValueMainHeader}>
-          {columnMeta.label}
-        </TableRow>
-        <TableRow>
-          {subHeaders.map((subHeader) => (
-            <TableCell key={subHeader} style={styles.multiValueSubHeader}>
-              {subHeader}
-            </TableCell>
-          ))}
-        </TableRow>
-      </th>
-    );
   };
 
   useEffect(() => {
+    console.log("userID: " + userID);
     console.log("Current Page: DataTable");
     handleGet();
+    // if (columns !== null) {
+    //   console.log(JSON.stringify(columns));
+    // }
   }, []);
 
   const styles = {
@@ -506,32 +526,29 @@ function DataTable2() {
       transitionTime: 300,
     },
     filter: false,
-    filterArrayFullMatch: filterArrayFullMatch,
-    filterType: "multiselect",
     responsive: "standard",
     confirmFilters: true,
     print: false,
     download: false,
-    // columnOrder: [12, 10, 2, 3, 4, 5, 1, 7, 6, 8, 9, 11, 0],
+    columnOrder: columnOrder,
     onColumnOrderChange: (newColumnOrder, columnIndex, newPosition) => {
       console.log(newColumnOrder);
+      setcolumnOrder(newColumnOrder);
     },
-    // customFilterDialogFooter: (currentFilterList, applyNewFilters) => {
-    //   return (
-    //     <div style={{ marginTop: '40px' }}>
-    //       <Button variant="contained" onClick={() => applyNewFilters()}>Apply</Button>
-    //     </div>
-    //   );
-    // }
     customToolbar: () => {
       return (
-        <CustomToolbar columns={columns} data={data} filteredData={setData} />
+        <CustomToolbar
+          columns={columns}
+          data={data}
+          filteredData={setData}
+          columnOrder={columnOrder}
+        />
       );
     },
   };
 
   return (
-    <>
+    <React.Fragment>
       <div
         style={{
           display: "flex",
@@ -542,20 +559,22 @@ function DataTable2() {
         <Link className="Link" to="/Home">
           <IconButton aria-label="backArrow">
             <img src={require("../Images/CSIT.png")} width="40%" />
-            {/* <ArrowLeftIcon />
-            <label style={{ fontSize: "15px" }}>HOME</label> */}
           </IconButton>
         </Link>
       </div>
       <ThemeProvider theme={theme}>
-        <MUIDataTable
-          title={"Employee list"}
-          data={isFilterApplied ? filteredData : data}
-          columns={columns}
-          options={options}
-        />
+        {columns !== null && columnOrder !== null ? (
+          <MUIDataTable
+            title={"Employee List"}
+            data={isFilterApplied ? filteredData : data}
+            columns={columns}
+            options={options}
+          />
+        ) : (
+          <div></div>
+        )}
       </ThemeProvider>
-    </>
+    </React.Fragment>
   );
 }
 

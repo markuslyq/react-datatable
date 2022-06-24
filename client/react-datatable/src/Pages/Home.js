@@ -29,7 +29,7 @@ function Home() {
 
   useEffect(() => {
     console.log("Current Page: Home");
-  }, []);
+  });
 
   return (
     <div className="App">
@@ -51,7 +51,7 @@ function Home() {
               <option value={3}>User 3</option>
             </Select>
           </FormControl>
-          <Link className="Link" to="/DataTable2">
+          <Link className="Link" to="/DataTable2" state={{ userID: userID}} >
             <ColorButton variant="contained" size="medium">
               Login
             </ColorButton>
