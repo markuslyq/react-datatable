@@ -80,8 +80,6 @@ export default function FilterRow(props) {
       : null
   );
 
-  // const [filterValue, setFilterValue] = useState(null);
-
   const id = props.id;
   const columns = props.columns;
   const data = props.data;
@@ -94,6 +92,11 @@ export default function FilterRow(props) {
     },
     {
       dataType: "string",
+      conditionOptions: ["EQUAL", "NOT EQUAL", "CONTAIN"],
+      renderOptions: ["multiEntry", "multiEntry", "multiEntryFreeSolo"],
+    },
+    {
+      dataType: "longString",
       conditionOptions: ["EQUAL", "NOT EQUAL", "CONTAIN"],
       renderOptions: ["multiEntry", "multiEntry", "multiEntryFreeSolo"],
     },
@@ -190,37 +193,15 @@ export default function FilterRow(props) {
         let columnNameSplit = columnSelected.split(".");
         if (columnNameSplit.length === 2) {
           let selectedColVals = dataObj[columnNameSplit[0]][columnNameSplit[1]];
-          // if (selectedColVals === null) {
-          //   textBoxOptions.add("--");
-          // } else if (selectedColVals === "") {
-          //   textBoxOptions.add("-");
-          // } else {
           selectedColVals.map((subHeaderValues) => {
-            // if (subHeaderValues === null) {
-            //   textBoxOptions.add("--");
-            // } else if (subHeaderValues === "") {
-            //   textBoxOptions.add("-");
-            // } else {
             textBoxOptions.add(subHeaderValues);
-            // }
           });
-          // }
         } else {
           let selectedColVals = dataObj[columnSelected];
           if (selectedColVals !== null && Array.isArray(selectedColVals)) {
             selectedColVals.map((colVal) => {
-              // if (colVal === null) {
-              //   textBoxOptions.add("--");
-              // } else if (colVal === "") {
-              //   textBoxOptions.add("-");
-              // } else {
               textBoxOptions.add(colVal);
-              // }
             });
-            // } else if (selectedColVals === null) {
-            //   textBoxOptions.add("--");
-            // } else if (selectedColVals === "") {
-            //   textBoxOptions.add("-");
           } else {
             textBoxOptions.add(selectedColVals);
           }

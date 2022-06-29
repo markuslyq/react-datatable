@@ -71,6 +71,26 @@ const processData = (result) => {
   return result;
 };
 
+const processTableSettings = (result) => {
+  for (let i = 0; i < result.length; i++) {
+    for (let key in result[i]) {
+      let value = result[i][key];
+      if (value !== null) {
+        if (typeof result[i][key] === "string") {
+          let str = result[i][key];
+          if (str != null) {
+            // Check if string is an array
+            if (isArray(str) || isJSON(str)) {
+              result[i][key] = JSONfn.parse(str);
+            }
+          }
+        }
+      }
+    }
+  }
+  return result;
+};
+
 const db = mysql.createConnection({
   user: "root",
   host: "localhost",
@@ -85,15 +105,21 @@ app.put("/updateColumnSettings", (req, res) => {
   const table_name = req.body.tableName;
   const column_order = JSON.stringify(req.body.columnOrder);
   const column_settings = JSON.stringify(req.body.columnSettings);
+  const queryArr = [user_id, table_name, column_order, column_settings, column_settings, column_order]
 
-  const updateStatement = `UPDATE settings.table_settings SET column_settings = ?, column_order = ? WHERE user_id = ? and table_name = ?`;
+  const updateStatement = `
+  INSERT INTO settings.table_settings (user_id, table_name, column_order, column_settings)
+  VALUES (?, ?, ?, ?)
+  ON DUPLICATE KEY
+  UPDATE column_settings = ?, column_order = ?;`;
 
   db.query(
     updateStatement,
-    [column_settings, column_order, user_id, table_name],
+    queryArr,
     (err, result) => {
       if (!err) {
-        console.log("Update successfully!");
+        res.send(result);
+        console.log("Upsert successfully!");
       } else {
         console.log(err);
       }
@@ -111,9 +137,7 @@ app.get("/getTableSettings", (req, res) => {
     WHERE user_id = ? AND table_name = ?`;
   db.query(getTableSettingsStatement, [user_id, table_name], (err, result) => {
     if (!err) {
-      let tableSettings = processData(result);
-      // console.log(tableSettings)
-      res.send(tableSettings);
+      res.send(result);
     } else {
       console.log(err);
     }

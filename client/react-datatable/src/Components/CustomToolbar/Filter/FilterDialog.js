@@ -55,11 +55,8 @@ export default function FilterDialog(props) {
     (state) => state.filter.deleteFilterRowIndex
   );
 
-  // const [isFilterApplied, setIsFilterApplied] = useState(false);
   const [filterRowArr, setFilterRowArr] = useState([]);
   const [renderCount, setRenderCount] = useState(0);
-
-  // const [filterObjArr, setFilterObjArr] = useState([]);
 
   const columns = props.columns;
   const data = props.data;

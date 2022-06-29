@@ -10,14 +10,17 @@ import {
   TableRow,
   Paper,
   IconButton,
+  Snackbar,
 } from "@mui/material";
 import CustomToolbar from "../Components/CustomToolbar/CustomToolbar";
+import CustomAlert from "../Components/Notification/CustomAlert";
 import { useLocation } from "react-router-dom";
 
 import axios from "axios";
 
 import { Link } from "react-router-dom";
-import { set } from "date-fns";
+
+import { setIsRevertClicked } from "../Components/CustomToolbar/Revert/revertSlice";
 
 function capitalizeFirstLetter(str) {
   // converting first letter to uppercase
@@ -38,248 +41,59 @@ function getSubHeaders(dataToProcess, key) {
 }
 
 function DataTable2() {
-  const isFilterApplied = useSelector((state) => state.filter.isFilterApplied);
-  const filteredData = useSelector((state) => state.filter.filteredData);
+  const dispatch = useDispatch();
 
-  const columnsDetails = [
-    {
-      name: "user_id",
-      label: "User ID",
-      dataType: "id",
-      options: {
-        filter: false,
-        display: false,
-        setCellProps: () => ({ style: styles.regularTableCell }),
-      },
-    },
-    {
-      name: "name",
-      label: "Name",
-      dataType: "string",
-      options: {
-        filter: true,
-        sortThirdClickReset: true,
-        setCellProps: () => ({ style: styles.regularTableCell }),
-      },
-    },
-    {
-      name: "phone",
-      label: "Phone",
-      dataType: "string",
-      options: {
-        print: false,
-        filter: true,
-        sortThirdClickReset: true,
-        setCellProps: () => ({ style: styles.regularTableCell }),
-      },
-    },
-    {
-      name: "email",
-      label: "Email",
-      dataType: "string",
-      options: {
-        filter: false,
-        print: false,
-        sortThirdClickReset: true,
-        setCellProps: () => ({ style: styles.regularTableCell }),
-      },
-    },
-    {
-      name: "start_date",
-      label: "Start Date",
-      dataType: "date",
-      options: {
-        filter: false,
-        sortThirdClickReset: true,
-        setCellProps: () => ({ style: styles.regularTableCell }),
-        customBodyRender: (value, tableMeta, updateValue) => {
-          if (value instanceof Date) {
-            return <label>{value.toLocaleDateString()}</label>;
-          } else {
-            return <label>{value}</label>;
-          }
-        },
-      },
-    },
-    {
-      name: "end_date",
-      label: "End Date",
-      dataType: "date",
-      options: {
-        filter: false,
-        sortThirdClickReset: true,
-        setCellProps: () => ({ style: styles.regularTableCell }),
-        customBodyRender: (value, tableMeta, updateValue) => {
-          if (value instanceof Date) {
-            return <label>{value.toLocaleDateString()}</label>;
-          } else {
-            return <label>{value}</label>;
-          }
-        },
-      },
-    },
-    {
-      name: "deadline",
-      label: "Deadline",
-      dataType: "date",
-      options: {
-        filter: false,
-        sortThirdClickReset: true,
-        setCellProps: () => ({ style: styles.regularTableCell }),
-        customBodyRender: (value, tableMeta, updateValue) => {
-          if (value instanceof Date) {
-            return <label>{value.toLocaleDateString()}</label>;
-          } else {
-            return <label>{value}</label>;
-          }
-        },
-      },
-    },
-    {
-      name: "postal_code",
-      label: "Postal Zip",
-      dataType: "string",
-      options: {
-        filter: false,
-        sortThirdClickReset: true,
-        setCellProps: () => ({ style: styles.regularTableCell }),
-      },
-    },
-    {
-      name: "country",
-      label: "Country",
-      dataType: "string",
-      options: {
-        filter: false,
-        sortThirdClickReset: true,
-        setCellProps: () => ({ style: styles.regularTableCell }),
-      },
-    },
-    {
-      name: "age",
-      label: "Age",
-      dataType: "number",
-      options: {
-        filter: false,
-        sortThirdClickReset: true,
-        setCellProps: () => ({ style: styles.regularTableCell }),
-      },
-    },
-    {
-      name: "cars",
-      label: "Cars",
-      dataType: "array",
-      options: {
-        filter: false,
-        sort: false,
-        setCellProps: () => ({ style: styles.regularTableCell }),
-        customBodyRender: (value, tableMeta, updateValue) => {
-          let maxHeight = getMaxHeight(tableMeta.rowData);
-          // if (value != null) {
-          return (
-            <div>
-              <Table
-                sx={{
-                  minWidth: "120px",
-                  height: maxHeight + 10,
-                  overflowY: "auto",
-                }}
-              >
-                <TableBody>
-                  {value.map((val, key) => {
-                    return (
-                      <TableRow key={key}>
-                        <TableCell
-                          sx={styles.innerTableCell}
-                          align="left"
-                          key={key}
-                          component={Paper}
-                        >
-                          {val ? val : "-"}
-                        </TableCell>
-                      </TableRow>
-                      // <Chip label={val} key={key} />
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </div>
-          );
-        },
-      },
-    },
-    {
-      name: "previous_company_info",
-      label: "Previous Companies",
-      dataType: "group",
-      options: {
-        filter: false,
-        sort: false,
-        setCellProps: () => ({ style: styles.regularTableCell }),
-        customHeadLabelRender: (columnMeta) => {
-          return renderSubHeader(columnMeta);
-        },
-        customBodyRender: (value, tableMeta, updateValue) => {
-          return renderSubBody(value, tableMeta);
-        },
-      },
-    },
-    {
-      name: "password",
-      label: "Password",
-      dataType: "string",
-      options: {
-        filter: false,
-        sortThirdClickReset: true,
-        setCellProps: () => ({ style: styles.regularTableCell }),
-      },
-    },
-    {
-      name: "notes",
-      label: "Notes",
-      dataType: "string",
-      options: {
-        filter: false,
-        sortThirdClickReset: true,
-        setCellProps: () => ({ style: styles.regularTableCell }),
-        customBodyRender: (value, tableMeta, updateValue) => {
-          let maxHeight = getMaxHeight(data[tableMeta.rowIndex]);
-          // if (value != null) {
-          return (
-            <div
-              style={{
-                width: "500px",
-                height: maxHeight,
-                overflow: "auto",
-                padding: 0,
-                margin: 0,
-              }}
-            >
-              {value}
-            </div>
-          );
-        },
-      },
-    },
-  ];
+  const parseColumnSettings = (oldColumnSettings) => {
+    let parsedColumnSettings = [];
 
-  const location = useLocation();
-  const { userID } = location.state;
+    if (oldColumnSettings !== null) {
+      oldColumnSettings.forEach((oldColumnInfo) => {
+        oldColumnInfo["options"]["setCellProps"] = () => ({
+          style: styles.regularTableCell,
+        });
 
-  const [data, setData] = useState([]);
-  const [columns, setColumns] = useState(null);
+        if (oldColumnInfo["dataType"] === "date") {
+          oldColumnInfo["options"]["customBodyRender"] = (value) => {
+            return renderDateBody(value);
+          };
+        }
+
+        if (oldColumnInfo["dataType"] === "longString") {
+          oldColumnInfo["options"]["customBodyRender"] = (value, tableMeta) => {
+            return renderLongStringBody(value, tableMeta);
+          };
+        }
+
+        if (oldColumnInfo["dataType"] === "array") {
+          oldColumnInfo["options"]["customBodyRender"] = (value, tableMeta) => {
+            return renderArrayBody(value, tableMeta);
+          };
+        }
+
+        if (oldColumnInfo["dataType"] === "group") {
+          oldColumnInfo["options"]["customHeadLabelRender"] = (columnMeta) => {
+            return renderSubHeader(columnMeta);
+          };
+          oldColumnInfo["options"]["customBodyRender"] = (value, tableMeta) => {
+            return renderSubBody(value, tableMeta);
+          };
+        }
+        parsedColumnSettings.push(oldColumnInfo);
+      });
+    }
+
+    return parsedColumnSettings;
+  };
 
   const getDefaultColumnOrder = () => {
     let colOrderArr = [];
     // if (columns !== null) {
-    for (let i = 0; i < columnsDetails.length; i++) {
+    for (let i = 0; i < columnDetails.length; i++) {
       colOrderArr.push(i);
       // }
     }
     return colOrderArr;
   };
-
-  const [columnOrder, setcolumnOrder] = useState(null);
 
   const isIsoDate = (dateStr) => {
     if (!/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/.test(dateStr))
@@ -356,21 +170,37 @@ function DataTable2() {
 
   const handleGet = () => {
     let dbColumnInfo = [];
-    //Get table configurations
-    axios
-      .get("http://localhost:3001/getTableSettings", {
-        params: {
-          userID: userID,
-          tableName: "Employee List",
-        },
-      })
-      .then((response) => {
-        console.log(response.data);
-        console.log(response.data[0].column_settings);
-        // dbColumnInfo = response.data[0].column_settings;
-        // setColumns(dbColumnInfo);
-        
-      });
+    let dbColumnOrder = [];
+
+    if (!isRevertClicked) {
+      //Get table configurations
+      axios
+        .get("http://localhost:3001/getTableSettings", {
+          params: {
+            userID: userID,
+            tableName: tableName,
+          },
+        })
+        .then((response) => {
+          console.log(response.data);
+
+          if (response.data.length > 0) {
+            if (response.data[0].column_order !== null) {
+              dbColumnInfo = parseColumnSettings(
+                JSON.parse(response.data[0].column_settings)
+              );
+              dbColumnOrder = JSON.parse(response.data[0].column_order);
+            }
+          }
+
+          if (dbColumnInfo.length !== 0) {
+            setColumns(dbColumnInfo);
+          }
+          if (dbColumnOrder.length !== 0) {
+            setColumnOrder(dbColumnOrder);
+          }
+        });
+    }
 
     //Get table data
     axios.get("http://localhost:3001/getData").then((response) => {
@@ -378,11 +208,69 @@ function DataTable2() {
       response.data = processDate(response.data);
       setData(response.data);
       if (dbColumnInfo.length === 0) {
-        let columnsInfo = addSubHeaders(columnsDetails, response.data);
-        setColumns(columnsInfo);
+        dbColumnInfo = addSubHeaders(columns, response.data);
+        setColumns(dbColumnInfo);
       }
-      setcolumnOrder(getDefaultColumnOrder());
     });
+  };
+
+  const renderDateBody = (value) => {
+    if (value instanceof Date) {
+      return <label>{value.toLocaleDateString()}</label>;
+    } else {
+      return <label>{value}</label>;
+    }
+  };
+
+  const renderLongStringBody = (value, tableMeta) => {
+    let maxHeight = getMaxHeight(data[tableMeta.rowIndex]);
+    return (
+      <div
+        style={{
+          width: "500px",
+          height: maxHeight,
+          overflow: "auto",
+          padding: 0,
+          margin: 0,
+        }}
+      >
+        {value}
+      </div>
+    );
+  };
+
+  const renderArrayBody = (value, tableMeta) => {
+    let maxHeight = getMaxHeight(tableMeta.rowData);
+    // if (value != null) {
+    return (
+      <div>
+        <Table
+          sx={{
+            minWidth: "120px",
+            height: maxHeight + 10,
+            overflowY: "auto",
+          }}
+        >
+          <TableBody>
+            {value.map((val, key) => {
+              return (
+                <TableRow key={key}>
+                  <TableCell
+                    sx={styles.innerTableCell}
+                    align="left"
+                    key={key}
+                    component={Paper}
+                  >
+                    {val ? val : "-"}
+                  </TableCell>
+                </TableRow>
+                // <Chip label={val} key={key} />
+              );
+            })}
+          </TableBody>
+        </Table>
+      </div>
+    );
   };
 
   const renderSubBody = (value, tableMeta) => {
@@ -427,9 +315,10 @@ function DataTable2() {
   const renderSubHeader = (columnMeta) => {
     let columnIndex = columnMeta.index;
     let subHeaders = [];
-    if (columns !== null) {
+    if (isLoadingFromDB) {
       if ("subHeaders" in columns[columnIndex]) {
         subHeaders = columns[columnIndex]["subHeaders"];
+        setIsLoadingFromDB(false);
       }
       return (
         <th>
@@ -448,14 +337,177 @@ function DataTable2() {
     }
   };
 
+  const handleSnackbarClose = (reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setIsSnackbarOpen(false);
+  };
+
+  const isFilterApplied = useSelector((state) => state.filter.isFilterApplied);
+  const filteredData = useSelector((state) => state.filter.filteredData);
+
+  const isRevertClicked = useSelector((state) => state.revert.isRevertClicked);
+
+  const columnDetails = [
+    {
+      name: "user_id",
+      label: "User ID",
+      dataType: "id",
+      options: {
+        filter: false,
+        display: false,
+      },
+    },
+    {
+      name: "name",
+      label: "Name",
+      dataType: "string",
+      options: {
+        filter: true,
+        sortThirdClickReset: true,
+      },
+    },
+    {
+      name: "phone",
+      label: "Phone",
+      dataType: "string",
+      options: {
+        print: false,
+        filter: true,
+        sortThirdClickReset: true,
+      },
+    },
+    {
+      name: "email",
+      label: "Email",
+      dataType: "string",
+      options: {
+        filter: false,
+        print: false,
+        sortThirdClickReset: true,
+      },
+    },
+    {
+      name: "start_date",
+      label: "Start Date",
+      dataType: "date",
+      options: {
+        filter: false,
+        sortThirdClickReset: true,
+      },
+    },
+    {
+      name: "end_date",
+      label: "End Date",
+      dataType: "date",
+      options: {
+        filter: false,
+        sortThirdClickReset: true,
+      },
+    },
+    {
+      name: "deadline",
+      label: "Deadline",
+      dataType: "date",
+      options: {
+        filter: false,
+        sortThirdClickReset: true,
+      },
+    },
+    {
+      name: "postal_code",
+      label: "Postal Zip",
+      dataType: "string",
+      options: {
+        filter: false,
+        sortThirdClickReset: true,
+      },
+    },
+    {
+      name: "country",
+      label: "Country",
+      dataType: "string",
+      options: {
+        filter: false,
+        sortThirdClickReset: true,
+      },
+    },
+    {
+      name: "age",
+      label: "Age",
+      dataType: "number",
+      options: {
+        filter: false,
+        sortThirdClickReset: true,
+      },
+    },
+    {
+      name: "cars",
+      label: "Cars",
+      dataType: "array",
+      options: {
+        filter: false,
+        sort: false,
+      },
+    },
+    {
+      name: "previous_company_info",
+      label: "Previous Companies",
+      dataType: "group",
+      options: {
+        filter: false,
+        sort: false,
+      },
+    },
+    {
+      name: "password",
+      label: "Password",
+      dataType: "string",
+      options: {
+        filter: false,
+        sortThirdClickReset: true,
+      },
+    },
+    {
+      name: "notes",
+      label: "Notes",
+      dataType: "longString",
+      options: {
+        filter: false,
+        sortThirdClickReset: true,
+      },
+    },
+  ];
+  const tableName = "Employee List";
+  const defaultColumnDetails = parseColumnSettings(columnDetails);
+
+  const location = useLocation();
+  const { userID } = location.state;
+
+  const [data, setData] = useState([]);
+  const [columns, setColumns] = useState(defaultColumnDetails);
+  const [columnOrder, setColumnOrder] = useState(getDefaultColumnOrder());
+
+  const [isLoadingFromDB, setIsLoadingFromDB] = useState(true);
+  const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);
+
   useEffect(() => {
     console.log("userID: " + userID);
     console.log("Current Page: DataTable");
-    handleGet();
+    if (isLoadingFromDB) {
+      handleGet();
+    }
+    if (isRevertClicked) {
+      setIsLoadingFromDB(true);
+      setColumnOrder(getDefaultColumnOrder());
+      setIsSnackbarOpen(true);
+      dispatch(setIsRevertClicked(false));
+    }
     // if (columns !== null) {
     //   console.log(JSON.stringify(columns));
     // }
-  }, []);
+  });
 
   const styles = {
     regularTableCell: {
@@ -531,13 +583,20 @@ function DataTable2() {
     print: false,
     download: false,
     columnOrder: columnOrder,
+    // setTableProps: () => {
+    //   return {
+    //     paddingTop: "none",
+    //     paddingBottom: "none",
+    //   };
+    // },
     onColumnOrderChange: (newColumnOrder, columnIndex, newPosition) => {
       console.log(newColumnOrder);
-      setcolumnOrder(newColumnOrder);
+      setColumnOrder(newColumnOrder);
     },
     customToolbar: () => {
       return (
         <CustomToolbar
+          defaultColumnDetails={defaultColumnDetails}
           columns={columns}
           data={data}
           filteredData={setData}
@@ -562,8 +621,21 @@ function DataTable2() {
           </IconButton>
         </Link>
       </div>
+      <Snackbar
+          open={isSnackbarOpen}
+          autoHideDuration={5000}
+          onClose={handleSnackbarClose}
+        >
+          <CustomAlert
+            onClose={handleSnackbarClose}
+            severity="success"
+            sx={{ width: "100%" }}
+          >
+            Revert Successfully
+          </CustomAlert>
+        </Snackbar>
       <ThemeProvider theme={theme}>
-        {columns !== null && columnOrder !== null ? (
+        {columns !== null && columnOrder !== null && data !== [] ? (
           <MUIDataTable
             title={"Employee List"}
             data={isFilterApplied ? filteredData : data}
@@ -571,7 +643,9 @@ function DataTable2() {
             options={options}
           />
         ) : (
-          <div></div>
+          <div>
+            <img src={require("../Images/loading.gif")} width="10%" />
+          </div>
         )}
       </ThemeProvider>
     </React.Fragment>

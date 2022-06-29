@@ -34,7 +34,7 @@ function Home() {
   return (
     <div className="App">
       <div className="App-header">
-        <Link className="Link" to="/DataTable">
+        <Link className="Link" to="/Home">
           <img src={require("../Images/CSIT.png")} width="100%" />
         </Link>
         <div style={{ display: "flex", flexDirection: "row", alignItems: 'center', marginTop: '20px' }}>
