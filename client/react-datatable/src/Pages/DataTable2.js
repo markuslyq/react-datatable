@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 import CustomToolbar from "../Components/CustomToolbar/CustomToolbar";
 import CustomAlert from "../Components/Notification/CustomAlert";
+import CustomSnackbar from "../Components/Notification/CustomSnackbar";
 import { useLocation } from "react-router-dom";
 
 import axios from "axios";
@@ -21,6 +22,13 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 
 import { setIsRevertClicked } from "../Components/CustomToolbar/Revert/revertSlice";
+import {
+  setIsSnackbarOpen,
+  setVariant,
+  setDuration,
+  setMessage,
+} from "../Components/Notification/snackbarSlice";
+import { set } from "date-fns";
 
 function capitalizeFirstLetter(str) {
   // converting first letter to uppercase
@@ -183,7 +191,6 @@ function DataTable2() {
         })
         .then((response) => {
           console.log(response.data);
-
           if (response.data.length > 0) {
             if (response.data[0].column_order !== null) {
               dbColumnInfo = parseColumnSettings(
@@ -201,7 +208,6 @@ function DataTable2() {
           }
         });
     }
-
     //Get table data
     axios.get("http://localhost:3001/getData").then((response) => {
       console.log(response);
@@ -212,6 +218,16 @@ function DataTable2() {
         setColumns(dbColumnInfo);
       }
     });
+  };
+
+  const handleRevertSettings = () => {
+    setIsLoadingFromDB(true);
+    setColumnOrder(getDefaultColumnOrder());
+    dispatch(setIsSnackbarOpen(true));
+    dispatch(setVariant("success"));
+    dispatch(setDuration(3000));
+    dispatch(setMessage("Revert Successfully"));
+    dispatch(setIsRevertClicked(false));
   };
 
   const renderDateBody = (value) => {
@@ -335,13 +351,6 @@ function DataTable2() {
         </th>
       );
     }
-  };
-
-  const handleSnackbarClose = (reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-    setIsSnackbarOpen(false);
   };
 
   const isFilterApplied = useSelector((state) => state.filter.isFilterApplied);
@@ -490,7 +499,6 @@ function DataTable2() {
   const [columnOrder, setColumnOrder] = useState(getDefaultColumnOrder());
 
   const [isLoadingFromDB, setIsLoadingFromDB] = useState(true);
-  const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);
 
   useEffect(() => {
     console.log("userID: " + userID);
@@ -499,14 +507,8 @@ function DataTable2() {
       handleGet();
     }
     if (isRevertClicked) {
-      setIsLoadingFromDB(true);
-      setColumnOrder(getDefaultColumnOrder());
-      setIsSnackbarOpen(true);
-      dispatch(setIsRevertClicked(false));
+      handleRevertSettings();
     }
-    // if (columns !== null) {
-    //   console.log(JSON.stringify(columns));
-    // }
   });
 
   const styles = {
@@ -621,19 +623,7 @@ function DataTable2() {
           </IconButton>
         </Link>
       </div>
-      <Snackbar
-          open={isSnackbarOpen}
-          autoHideDuration={5000}
-          onClose={handleSnackbarClose}
-        >
-          <CustomAlert
-            onClose={handleSnackbarClose}
-            severity="success"
-            sx={{ width: "100%" }}
-          >
-            Revert Successfully
-          </CustomAlert>
-        </Snackbar>
+      <CustomSnackbar />
       <ThemeProvider theme={theme}>
         {columns !== null && columnOrder !== null && data !== [] ? (
           <MUIDataTable
