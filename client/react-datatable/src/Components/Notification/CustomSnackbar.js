@@ -1,10 +1,14 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Snackbar } from "@mui/material";
+import { Snackbar, Slide } from "@mui/material";
 
 import CustomAlert from "./CustomAlert";
 
 import { setIsSnackbarOpen } from "./snackbarSlice";
+
+function SlideTransition(props) {
+  return <Slide {...props} direction="up" />;
+}
 
 export default function CustomSnackbar(props) {
   const dispatch = useDispatch();
@@ -25,12 +29,9 @@ export default function CustomSnackbar(props) {
       open={isSnackbarOpen}
       autoHideDuration={snackbarDuration}
       onClose={handleSnackbarClose}
+      TransitionComponent={SlideTransition}
     >
-      <CustomAlert
-        onClose={handleSnackbarClose}
-        severity={snackbarVariant}
-        sx={{ width: "100%" }}
-      >
+      <CustomAlert onClose={handleSnackbarClose} severity={snackbarVariant} sx={{ width: "100%" }}>
         {snackbarMessage}
       </CustomAlert>
     </Snackbar>

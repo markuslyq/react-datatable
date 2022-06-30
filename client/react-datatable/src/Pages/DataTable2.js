@@ -3,15 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import "../App.css";
 import MUIDataTable from "mui-datatables";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableRow,
-  Paper,
-  IconButton,
-  Snackbar,
-} from "@mui/material";
+import { Table, TableBody, TableCell, TableRow, Paper, IconButton, Snackbar } from "@mui/material";
 import CustomToolbar from "../Components/CustomToolbar/CustomToolbar";
 import CustomAlert from "../Components/Notification/CustomAlert";
 import CustomSnackbar from "../Components/Notification/CustomSnackbar";
@@ -104,8 +96,7 @@ function DataTable2() {
   };
 
   const isIsoDate = (dateStr) => {
-    if (!/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/.test(dateStr))
-      return false;
+    if (!/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/.test(dateStr)) return false;
     var d = new Date(dateStr);
     return d.toISOString() === dateStr;
   };
@@ -193,9 +184,7 @@ function DataTable2() {
           console.log(response.data);
           if (response.data.length > 0) {
             if (response.data[0].column_order !== null) {
-              dbColumnInfo = parseColumnSettings(
-                JSON.parse(response.data[0].column_settings)
-              );
+              dbColumnInfo = parseColumnSettings(JSON.parse(response.data[0].column_settings));
               dbColumnOrder = JSON.parse(response.data[0].column_order);
             }
           }
@@ -271,12 +260,7 @@ function DataTable2() {
             {value.map((val, key) => {
               return (
                 <TableRow key={key}>
-                  <TableCell
-                    sx={styles.innerTableCell}
-                    align="left"
-                    key={key}
-                    component={Paper}
-                  >
+                  <TableCell sx={styles.innerTableCell} align="left" key={key} component={Paper}>
                     {val ? val : "-"}
                   </TableCell>
                 </TableRow>
@@ -338,9 +322,7 @@ function DataTable2() {
       }
       return (
         <th>
-          <TableRow style={styles.multiValueMainHeader}>
-            {columnMeta.label}
-          </TableRow>
+          <TableRow style={styles.multiValueMainHeader}>{columnMeta.label}</TableRow>
           <TableRow>
             {subHeaders.map((subHeader) => (
               <TableCell key={subHeader} style={styles.multiValueSubHeader}>
@@ -598,11 +580,10 @@ function DataTable2() {
     customToolbar: () => {
       return (
         <CustomToolbar
-          defaultColumnDetails={defaultColumnDetails}
           columns={columns}
           data={data}
-          filteredData={setData}
           columnOrder={columnOrder}
+          tableName={tableName}
         />
       );
     },
@@ -627,7 +608,7 @@ function DataTable2() {
       <ThemeProvider theme={theme}>
         {columns !== null && columnOrder !== null && data !== [] ? (
           <MUIDataTable
-            title={"Employee List"}
+            title={tableName}
             data={isFilterApplied ? filteredData : data}
             columns={columns}
             options={options}

@@ -24,7 +24,6 @@ const snackbarSlice = createSlice({
   },
 });
 
-export const { setIsSnackbarOpen, setVariant, setDuration, setMessage } =
-  snackbarSlice.actions;
+export const { setIsSnackbarOpen, setVariant, setDuration, setMessage } = snackbarSlice.actions;
 
 export default snackbarSlice.reducer;

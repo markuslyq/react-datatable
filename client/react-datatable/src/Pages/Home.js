@@ -1,12 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "../App.css";
-import {
-  Button,
-  FormControl,
-  InputLabel,
-  Select,
-  OutlinedInput,
-} from "@mui/material/";
+import { Button, FormControl, InputLabel, Select, OutlinedInput } from "@mui/material/";
 import { styled } from "@mui/material/styles";
 import { amber } from "@mui/material/colors";
 
@@ -37,7 +31,9 @@ function Home() {
         <Link className="Link" to="/Home">
           <img src={require("../Images/CSIT.png")} width="100%" />
         </Link>
-        <div style={{ display: "flex", flexDirection: "row", alignItems: 'center', marginTop: '20px' }}>
+        <div
+          style={{ display: "flex", flexDirection: "row", alignItems: "center", marginTop: "20px" }}
+        >
           <FormControl sx={{ m: 1, mr: 3, minWidth: 200 }}>
             <InputLabel>Select User</InputLabel>
             <Select
@@ -51,7 +47,7 @@ function Home() {
               <option value={3}>User 3</option>
             </Select>
           </FormControl>
-          <Link className="Link" to="/DataTable2" state={{ userID: userID}} >
+          <Link className="Link" to="/DataTable2" state={{ userID: userID }}>
             <ColorButton variant="contained" size="medium">
               Login
             </ColorButton>

@@ -100,31 +100,73 @@ const db = mysql.createConnection({
 
 app.post("/create", (req, res) => {});
 
+app.put("/updateFilterSettings", (req, res) => {
+  const user_id = req.body.userID;
+  const table_name = req.body.tableName;
+  const filter_settings = JSON.stringify(req.body.filterSettings);
+  const queryArr = [user_id, table_name, filter_settings, filter_settings];
+
+  const updateStatement = `
+  INSERT INTO settings.filter_settings (user_id, table_name, filter_settings)
+  VALUES (?, ?, ?)
+  ON DUPLICATE KEY
+  UPDATE filter_settings = ?`;
+
+  db.query(updateStatement, queryArr, (err, result) => {
+    if (!err) {
+      res.send(result);
+      console.log("Upsert filter settings successfully!");
+    } else {
+      console.log(err);
+    }
+  });
+});
+
 app.put("/updateColumnSettings", (req, res) => {
   const user_id = req.body.userID;
   const table_name = req.body.tableName;
   const column_order = JSON.stringify(req.body.columnOrder);
   const column_settings = JSON.stringify(req.body.columnSettings);
-  const queryArr = [user_id, table_name, column_order, column_settings, column_settings, column_order]
+  const queryArr = [
+    user_id,
+    table_name,
+    column_order,
+    column_settings,
+    column_order,
+    column_settings,
+  ];
 
   const updateStatement = `
   INSERT INTO settings.table_settings (user_id, table_name, column_order, column_settings)
   VALUES (?, ?, ?, ?)
   ON DUPLICATE KEY
-  UPDATE column_settings = ?, column_order = ?;`;
+  UPDATE column_order = ?, column_settings = ?;`;
 
-  db.query(
-    updateStatement,
-    queryArr,
-    (err, result) => {
-      if (!err) {
-        res.send(result);
-        console.log("Upsert successfully!");
-      } else {
-        console.log(err);
-      }
+  db.query(updateStatement, queryArr, (err, result) => {
+    if (!err) {
+      res.send(result);
+      console.log("Upsert table settings successfully!");
+    } else {
+      console.log(err);
     }
-  );
+  });
+});
+
+app.get("/getFilterSettings", (req, res) => {
+  console.log("getFilterSettings");
+  const user_id = req.query.userID;
+  const table_name = req.query.tableName;
+
+  const getTableSettingsStatement = `SELECT filter_settings
+    FROM settings.filter_settings 
+    WHERE user_id = ? AND table_name = ?`;
+  db.query(getTableSettingsStatement, [user_id, table_name], (err, result) => {
+    if (!err) {
+      res.send(result);
+    } else {
+      console.log(err);
+    }
+  });
 });
 
 app.get("/getTableSettings", (req, res) => {

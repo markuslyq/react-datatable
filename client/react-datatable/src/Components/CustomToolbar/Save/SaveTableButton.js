@@ -18,16 +18,17 @@ export default function SaveTableButton(props) {
 
   const location = useLocation();
   const { userID } = location.state;
+  const tableName = props.tableName;
   const columnSettings = props.columnSettings;
   const columnOrder = props.columnOrder;
 
   const handleSaveTable = () => {
     console.log("Save Button Clicked!");
-    console.log("userID on save table button click: " + userID);
+    // console.log("userID on save table button click: " + userID);
     axios
       .put("http://localhost:3001/updateColumnSettings", {
         userID: userID,
-        tableName: "Employee List",
+        tableName: tableName,
         columnOrder: columnOrder,
         columnSettings: columnSettings,
       })
@@ -35,7 +36,7 @@ export default function SaveTableButton(props) {
         dispatch(setIsSnackbarOpen(true));
         dispatch(setVariant("success"));
         dispatch(setDuration(3000));
-        dispatch(setMessage("Save Table Configuration Successfully"));
+        dispatch(setMessage("Save Table Settings Successfully"));
       })
       .catch((error) => {
         dispatch(setIsSnackbarOpen(true));
@@ -47,7 +48,7 @@ export default function SaveTableButton(props) {
 
   return (
     <React.Fragment>
-      <Tooltip title={"Save Table Configuration"}>
+      <Tooltip title={"Save Table Settings"}>
         <IconButton
           onClick={handleSaveTable}
           sx={{ padding: 0, maxHeight: "40px", maxWidth: "40px" }}

@@ -17,41 +17,27 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
-import {
-  setFilterCount,
-  pushFilterObjArr,
-  setDeleteFilterRowIndex,
-} from "./filterSlice";
+import { setFilterCount, pushFilterObjArr, setDeleteFilterRowIndex } from "./filterSlice";
 
 export default function FilterRow(props) {
   const dispatch = useDispatch();
 
   const filterCount = useSelector((state) => state.filter.filterCount);
-  const isFilterAppliedClicked = useSelector(
-    (state) => state.filter.isFilterAppliedClicked
-  );
+  const isFilterAppliedClicked = useSelector((state) => state.filter.isFilterAppliedClicked);
   const filterObj = useSelector((state) => state.filter.filterObjArr[props.id]);
 
   const [dataType, setDataType] = useState(null);
   const [renderSelected, setRenderSelected] = useState("");
 
-  const [columnSelected, setColumnSelected] = useState(
-    filterObj ? filterObj.column : ""
-  );
-  const [conditionSelected, setConditionSelected] = useState(
-    filterObj ? filterObj.condition : ""
-  );
+  const [columnSelected, setColumnSelected] = useState(filterObj ? filterObj.column : "");
+  const [conditionSelected, setConditionSelected] = useState(filterObj ? filterObj.condition : "");
 
   const [multiEntryValue, setMultiEntryValue] = useState(
     filterObj ? (Array.isArray(filterObj.value) ? filterObj.value : null) : null
   );
 
   const [filterDate, setFilterDate] = useState(
-    filterObj
-      ? filterObj.value instanceof Date
-        ? filterObj.value
-        : null
-      : null
+    filterObj ? (filterObj.value instanceof Date ? filterObj.value : null) : null
   );
 
   const [filterStartDate, setFilterStartDate] = useState(
@@ -113,30 +99,18 @@ export default function FilterRow(props) {
     {
       dataType: "array",
       conditionOptions: ["IN LIST", "NOT IN LIST", "LIST NOT EQUAL", "CONTAIN"],
-      renderOptions: [
-        "multiEntry",
-        "multiEntry",
-        "multiEntry",
-        "multiEntryFreeSolo",
-      ],
+      renderOptions: ["multiEntry", "multiEntry", "multiEntry", "multiEntryFreeSolo"],
     },
     {
       dataType: "group",
       conditionOptions: ["IN LIST", "NOT IN LIST", "LIST NOT EQUAL", "CONTAIN"],
-      renderOptions: [
-        "multiEntry",
-        "multiEntry",
-        "multiEntry",
-        "multiEntryFreeSolo",
-      ],
+      renderOptions: ["multiEntry", "multiEntry", "multiEntry", "multiEntryFreeSolo"],
     },
   ];
 
   const getDataType = () => {
     let selectedColumnName = columnSelected.split(".");
-    let columnIndex = columns.findIndex(
-      (col) => col.name == selectedColumnName[0]
-    );
+    let columnIndex = columns.findIndex((col) => col.name == selectedColumnName[0]);
     if (columns[columnIndex]) {
       setDataType(columns[columnIndex]["dataType"]);
     }
@@ -144,9 +118,7 @@ export default function FilterRow(props) {
 
   const getConditionOptions = () => {
     if (dataType) {
-      let filterObj = filterCriteria.find(
-        (conditionObj) => conditionObj.dataType == dataType
-      );
+      let filterObj = filterCriteria.find((conditionObj) => conditionObj.dataType == dataType);
       return filterObj.conditionOptions;
     }
     return [];
@@ -154,9 +126,7 @@ export default function FilterRow(props) {
 
   const getRenderOption = () => {
     if (dataType && conditionSelected) {
-      let filterObj = filterCriteria.find(
-        (conditionObj) => conditionObj.dataType == dataType
-      );
+      let filterObj = filterCriteria.find((conditionObj) => conditionObj.dataType == dataType);
       let index = filterObj.conditionOptions.indexOf(conditionSelected);
       return filterObj.renderOptions[index];
     }
@@ -231,11 +201,7 @@ export default function FilterRow(props) {
                 defaultValue={multiEntryValue === null ? [] : multiEntryValue}
                 filterSelectedOptions
                 renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Value"
-                    placeholder="Filter Value"
-                  />
+                  <TextField {...params} label="Value" placeholder="Filter Value" />
                 )}
                 onChange={(event, values) => {
                   setMultiEntryValue(values);
@@ -255,19 +221,11 @@ export default function FilterRow(props) {
                 freeSolo
                 renderTags={(value, getTagProps) =>
                   value.map((option, index) => (
-                    <Chip
-                      variant="outlined"
-                      label={option}
-                      {...getTagProps({ index })}
-                    />
+                    <Chip variant="outlined" label={option} {...getTagProps({ index })} />
                   ))
                 }
                 renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Value"
-                    placeholder="Filter Value"
-                  />
+                  <TextField {...params} label="Value" placeholder="Filter Value" />
                 )}
                 onChange={(event, values) => {
                   setMultiEntryValue(values);
@@ -346,12 +304,7 @@ export default function FilterRow(props) {
                 defaultValue={multiEntryValue === null ? [] : multiEntryValue}
                 filterSelectedOptions
                 renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Value"
-                    placeholder="Filter Value"
-                    type="number"
-                  />
+                  <TextField {...params} label="Value" placeholder="Filter Value" type="number" />
                 )}
                 onChange={(event, values) => {
                   setMultiEntryValue(values);

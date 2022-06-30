@@ -33,6 +33,9 @@ const filterSlice = createSlice({
     pushFilterObjArr: (state, action) => {
       state.filterObjArr.push(action.payload);
     },
+    setFilterObjArr: (state, action) => {
+      state.filterObjArr = action.payload;
+    },
     setDeleteFilterRowIndex: (state, action) => {
       state.deleteFilterRowIndex = action.payload;
     },
@@ -53,6 +56,7 @@ export const {
   setIsFilterApplied,
   clearFilterObjArr,
   pushFilterObjArr,
+  setFilterObjArr,
   setDeleteFilterRowIndex,
   deleteFilterObj,
   setFilteredData,
