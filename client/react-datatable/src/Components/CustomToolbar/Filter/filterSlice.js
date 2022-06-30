@@ -3,6 +3,7 @@ import { createSlice, createSelector } from "@reduxjs/toolkit";
 const filterSlice = createSlice({
   name: "filter",
   initialState: {
+    filterUserID: -1,
     isFilterDialogOpen: false,
     isFilterAppliedClicked: false,
     isFilterApplied: false,
@@ -12,6 +13,9 @@ const filterSlice = createSlice({
     filteredData: [],
   },
   reducers: {
+    setFilterUserID: (state, action) => {
+      state.filterUserID = action.payload;
+    },
     openFilterDialog: (state) => {
       state.isFilterDialogOpen = true;
     },
@@ -49,6 +53,7 @@ const filterSlice = createSlice({
 });
 
 export const {
+  setFilterUserID,
   openFilterDialog,
   closeFilterDialog,
   setFilterCount,

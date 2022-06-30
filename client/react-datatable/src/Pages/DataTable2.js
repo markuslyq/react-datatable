@@ -3,7 +3,17 @@ import { useSelector, useDispatch } from "react-redux";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import "../App.css";
 import MUIDataTable from "mui-datatables";
-import { Table, TableBody, TableCell, TableRow, Paper, IconButton, Snackbar } from "@mui/material";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableRow,
+  Paper,
+  IconButton,
+  Snackbar,
+  Avatar,
+} from "@mui/material";
+import { amber } from "@mui/material/colors";
 import CustomToolbar from "../Components/CustomToolbar/CustomToolbar";
 import CustomAlert from "../Components/Notification/CustomAlert";
 import CustomSnackbar from "../Components/Notification/CustomSnackbar";
@@ -13,6 +23,11 @@ import axios from "axios";
 
 import { Link } from "react-router-dom";
 
+import {
+  clearFilterObjArr,
+  setFilterUserID,
+  setIsFilterAppliedClicked,
+} from "../Components/CustomToolbar/Filter/filterSlice";
 import { setIsRevertClicked } from "../Components/CustomToolbar/Revert/revertSlice";
 import {
   setIsSnackbarOpen,
@@ -20,7 +35,6 @@ import {
   setDuration,
   setMessage,
 } from "../Components/Notification/snackbarSlice";
-import { set } from "date-fns";
 
 function capitalizeFirstLetter(str) {
   // converting first letter to uppercase
@@ -337,6 +351,7 @@ function DataTable2() {
 
   const isFilterApplied = useSelector((state) => state.filter.isFilterApplied);
   const filteredData = useSelector((state) => state.filter.filteredData);
+  const filterUserID = useSelector((state) => state.filter.filterUserID);
 
   const isRevertClicked = useSelector((state) => state.revert.isRevertClicked);
 
@@ -485,6 +500,11 @@ function DataTable2() {
   useEffect(() => {
     console.log("userID: " + userID);
     console.log("Current Page: DataTable");
+    if (filterUserID !== userID) {
+      dispatch(clearFilterObjArr());
+      dispatch(setFilterUserID(userID));
+      dispatch(setIsFilterAppliedClicked(true));
+    }
     if (isLoadingFromDB) {
       handleGet();
     }
@@ -595,7 +615,8 @@ function DataTable2() {
         style={{
           display: "flex",
           flexDirection: "row",
-          justifyContent: "left",
+          justifyContent: "space-between",
+          paddingRight: 30,
         }}
       >
         <Link className="Link" to="/Home">
@@ -603,6 +624,10 @@ function DataTable2() {
             <img src={require("../Images/CSIT.png")} width="40%" />
           </IconButton>
         </Link>
+        <div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+          <Avatar sx={{ bgcolor: amber[800], height: 35, width: 35 }}>{userID}</Avatar>
+          <label style={{marginLeft: 5}}>User {userID}</label>
+        </div>
       </div>
       <CustomSnackbar />
       <ThemeProvider theme={theme}>
