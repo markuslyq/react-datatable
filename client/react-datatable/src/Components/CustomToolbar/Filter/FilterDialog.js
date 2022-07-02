@@ -10,7 +10,7 @@ import {
   DialogTitle,
 } from "@mui/material";
 import FilterListIcon from "@mui/icons-material/FilterList";
-import DeleteIcon from "@mui/icons-material/Delete";
+import ClearIcon from "@mui/icons-material/Clear";
 import FilterRow from "./FilterRow";
 import {
   closeFilterDialog,
@@ -38,10 +38,7 @@ export default function FilterDialog(props) {
   const dispatch = useDispatch();
 
   const isFilterDialogOpen = useSelector((state) => state.filter.isFilterDialogOpen);
-  const filterCount = useSelector((state) => state.filter.filterCount);
   const [filterObjArr, setFilterObjArr] = useState(store.getState().filter.filterObjArr);
-  const isFilterApplied = useSelector((state) => state.filter.isFilterApplied);
-  const isFilterAppliedClicked = useSelector((state) => state.filter.isFilterAppliedClicked);
   const deleteFilterRowIndex = useSelector((state) => state.filter.deleteFilterRowIndex);
 
   const [filterRowArr, setFilterRowArr] = useState([]);
@@ -125,13 +122,13 @@ export default function FilterDialog(props) {
     <Dialog fullWidth={true} maxWidth="md" open={isFilterDialogOpen} onClose={handleCloseDialog}>
       <DialogTitle sx={{ fontWeight: "bold", pr: 0 }}>
         <Grid container spacing={0}>
-          <Grid item xs={10}>
+          <Grid item xs={10} sx={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
             <FilterListIcon sx={{ mr: 1 }} />
-            Filters :
+            Filters:
           </Grid>
           <Grid item xs={2}>
             <Button onClick={handleClearFilter}>
-              <DeleteIcon fontSize="small" />
+              <ClearIcon fontSize="small" />
               CLEAR FILTER
             </Button>
           </Grid>

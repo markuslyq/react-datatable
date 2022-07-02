@@ -262,7 +262,7 @@ function DataTable2() {
     let maxHeight = getMaxHeight(tableMeta.rowData);
     // if (value != null) {
     return (
-      <div>
+      <React.Fragment>
         <Table
           sx={{
             minWidth: "120px",
@@ -283,7 +283,7 @@ function DataTable2() {
             })}
           </TableBody>
         </Table>
-      </div>
+      </React.Fragment>
     );
   };
 
@@ -583,7 +583,8 @@ function DataTable2() {
     },
     filter: false,
     responsive: "standard",
-    confirmFilters: true,
+    selectableRowsOnClick: true,
+    selectableRowsHideCheckboxes: true,
     print: false,
     download: false,
     columnOrder: columnOrder,
@@ -626,7 +627,7 @@ function DataTable2() {
         </Link>
         <div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
           <Avatar sx={{ bgcolor: amber[800], height: 35, width: 35 }}>{userID}</Avatar>
-          <label style={{marginLeft: 5}}>User {userID}</label>
+          <label style={{ marginLeft: 5 }}>User {userID}</label>
         </div>
       </div>
       <CustomSnackbar />
