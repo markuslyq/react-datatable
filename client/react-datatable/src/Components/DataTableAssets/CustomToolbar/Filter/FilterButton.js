@@ -3,9 +3,10 @@ import { useSelector, useDispatch } from "react-redux";
 import { IconButton, Tooltip, Badge } from "@mui/material";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import FilterDialog from "./FilterDialog";
-import { openFilterDialog } from "./filterSlice";
 
 import {
+  openFilterDialog,
+  setIsOnInitialLoad,
   setFilteredData,
   setFilterCount,
   setIsFilterApplied,
@@ -17,9 +18,9 @@ import {
   setVariant,
   setDuration,
   setMessage,
-} from "../../Notification/snackbarSlice";
+} from "../../../Notification/snackbarSlice";
 
-import store from "../../../store";
+import store from "../../../../store";
 
 function areArraysEqual(array1, array2) {
   if (array1.length === array2.length) {
@@ -37,6 +38,7 @@ function areArraysEqual(array1, array2) {
 export default function FilterButton(props) {
   const dispatch = useDispatch();
 
+  const isOnInitialLoad = useSelector((state) => state.filter.isOnInitialLoad);
   const filterCount = useSelector((state) => state.filter.filterCount);
   const isFilterAppliedClicked = useSelector((state) => state.filter.isFilterAppliedClicked);
 
@@ -217,6 +219,14 @@ export default function FilterButton(props) {
 
   useEffect(() => {
     let latestFilterObjArr = store.getState().filter.filterObjArr;
+
+    if (isOnInitialLoad) {
+      let filteredData = filterData(latestFilterObjArr);
+      dispatch(setFilteredData(filteredData));
+      let newFilterCount = latestFilterObjArr.length;
+      dispatch(setFilterCount(newFilterCount));
+      dispatch(setIsOnInitialLoad(false));
+    }
 
     //Handles application of filter
     if (isFilterAppliedClicked) {

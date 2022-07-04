@@ -4,6 +4,7 @@ const filterSlice = createSlice({
   name: "filter",
   initialState: {
     filterUserID: -1,
+    isOnInitialLoad: false,
     isFilterDialogOpen: false,
     isFilterAppliedClicked: false,
     isFilterApplied: false,
@@ -15,6 +16,9 @@ const filterSlice = createSlice({
   reducers: {
     setFilterUserID: (state, action) => {
       state.filterUserID = action.payload;
+    },
+    setIsOnInitialLoad: (state, action) => {
+      state.isOnInitialLoad = action.payload;
     },
     openFilterDialog: (state) => {
       state.isFilterDialogOpen = true;
@@ -54,6 +58,7 @@ const filterSlice = createSlice({
 
 export const {
   setFilterUserID,
+  setIsOnInitialLoad,
   openFilterDialog,
   closeFilterDialog,
   setFilterCount,

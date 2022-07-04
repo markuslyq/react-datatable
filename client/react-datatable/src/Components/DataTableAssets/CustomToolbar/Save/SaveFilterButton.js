@@ -11,7 +11,7 @@ import {
   setVariant,
   setDuration,
   setMessage,
-} from "../../Notification/snackbarSlice";
+} from "../../../Notification/snackbarSlice";
 
 export default function SaveFilterButton(props) {
   const dispatch = useDispatch();
@@ -50,7 +50,7 @@ export default function SaveFilterButton(props) {
     <Tooltip title={"Save Filter Settings"}>
       <IconButton onClick={handleSaveFilter} sx={{ padding: 0, height: "40px", width: "40px" }}>
         <img
-          src={require("../../../Images/Save Filter Icon.png")}
+          src={require("../../../../Images/Save Filter Icon.png")}
           width="50%"
           style={{ margin: 0 }}
         />

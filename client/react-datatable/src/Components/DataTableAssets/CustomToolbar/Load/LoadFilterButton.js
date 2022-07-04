@@ -12,7 +12,7 @@ import {
   setVariant,
   setDuration,
   setMessage,
-} from "../../Notification/snackbarSlice";
+} from "../../../Notification/snackbarSlice";
 
 export default function LoadFilterButton(props) {
   const dispatch = useDispatch();
@@ -88,7 +88,7 @@ export default function LoadFilterButton(props) {
           sx={{ padding: 0, maxHeight: "40px", maxWidth: "40px" }}
         >
           <img
-            src={require("../../../Images/Load Filter Icon.png")}
+            src={require("../../../../Images/Load Filter Icon.png")}
             width="50%"
             style={{ margin: 0 }}
           />

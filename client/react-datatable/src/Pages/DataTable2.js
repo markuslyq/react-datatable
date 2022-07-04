@@ -3,32 +3,22 @@ import { useSelector, useDispatch } from "react-redux";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import "../App.css";
 import MUIDataTable from "mui-datatables";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableRow,
-  Paper,
-  IconButton,
-  Snackbar,
-  Avatar,
-} from "@mui/material";
+import { Table, TableBody, TableCell, TableRow, Paper, IconButton, Avatar } from "@mui/material";
 import { amber } from "@mui/material/colors";
-import CustomToolbar from "../Components/CustomToolbar/CustomToolbar";
-import CustomAlert from "../Components/Notification/CustomAlert";
+import CustomToolbar from "../Components/DataTableAssets/CustomToolbar/CustomToolbar";
+import CustomToolbarSelect from "../Components/DataTableAssets/CustomToolbarSelect/CustomToolbarSelect";
 import CustomSnackbar from "../Components/Notification/CustomSnackbar";
 import { useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 import axios from "axios";
-
-import { Link } from "react-router-dom";
 
 import {
   clearFilterObjArr,
   setFilterUserID,
-  setIsFilterAppliedClicked,
-} from "../Components/CustomToolbar/Filter/filterSlice";
-import { setIsRevertClicked } from "../Components/CustomToolbar/Revert/revertSlice";
+  setIsOnInitialLoad,
+} from "../Components/DataTableAssets/CustomToolbar/Filter/filterSlice";
+import { setIsRevertClicked } from "../Components/DataTableAssets/CustomToolbar/Revert/revertSlice";
 import {
   setIsSnackbarOpen,
   setVariant,
@@ -503,7 +493,7 @@ function DataTable2() {
     if (filterUserID !== userID) {
       dispatch(clearFilterObjArr());
       dispatch(setFilterUserID(userID));
-      dispatch(setIsFilterAppliedClicked(true));
+      dispatch(setIsOnInitialLoad(true));
     }
     if (isLoadingFromDB) {
       handleGet();
@@ -607,6 +597,9 @@ function DataTable2() {
           tableName={tableName}
         />
       );
+    },
+    customToolbarSelect: (selectedRows, displayData, setSelectedRows) => {
+      return <CustomToolbarSelect columns={columns} selectedRows={selectedRows} displayData={displayData}/>;
     },
   };
 

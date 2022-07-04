@@ -19,7 +19,7 @@ import {
   setDeleteFilterRowIndex,
 } from "./filterSlice";
 import { setDayOfYear } from "date-fns";
-import store from "../../../store";
+import store from "../../../../store";
 
 function areArraysEqual(array1, array2) {
   if (array1.length === array2.length) {
