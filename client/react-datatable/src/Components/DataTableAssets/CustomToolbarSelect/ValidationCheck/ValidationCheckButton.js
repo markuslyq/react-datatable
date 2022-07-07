@@ -1,21 +1,23 @@
 import React from "react";
 import { IconButton, Tooltip } from "@mui/material";
 import FactCheckIcon from "@mui/icons-material/FactCheck";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 
 export default function ValidationCheckButton(props) {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const state = location.state;
   const columns = props.columns;
   const selectedRows = props.selectedRows;
-  const displayData = props.displayData;
+  const data = props.data;
   const colVariableToCheck = "country";
   const colIndexToCheck = columns.findIndex((col) => col.name == colVariableToCheck);
 
   const getSelectedData = () => {
     let selectedData = [];
     for (let key in selectedRows.lookup) {
-      let displayDataIndex = displayData.findIndex(
-        (displayDataRow) => displayDataRow.dataIndex == key
-      );
-      selectedData.push(displayData[displayDataIndex].data);
+      selectedData.push(data[key]);
     }
     return selectedData;
   };
@@ -29,7 +31,15 @@ export default function ValidationCheckButton(props) {
   const handleValidationCheck = () => {
     let selectedData = getSelectedData();
     if (isValidDataCheck(selectedData)) {
-      console.log("same country");
+      let navObj = {
+        state: {
+          ...state,
+          columns: columns,
+          selectedData: selectedData,
+        },
+      };
+      console.log(selectedData);
+      navigate("/PostValidationCheck", navObj);
     } else {
       console.log("diff country");
     }

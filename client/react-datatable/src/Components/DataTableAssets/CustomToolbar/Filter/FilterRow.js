@@ -22,7 +22,7 @@ import { setFilterCount, pushFilterObjArr, setDeleteFilterRowIndex } from "./fil
 export default function FilterRow(props) {
   const dispatch = useDispatch();
 
-  const filterCount = useSelector((state) => state.filter.filterCount);
+
   const isFilterAppliedClicked = useSelector((state) => state.filter.isFilterAppliedClicked);
   const filterObj = useSelector((state) => state.filter.filterObjArr[props.id]);
 

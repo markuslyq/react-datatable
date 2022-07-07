@@ -17,6 +17,7 @@ export default function SaveTableButton(props) {
 
   const location = useLocation();
   const { userID } = location.state;
+
   const tableName = props.tableName;
   const columnSettings = props.columnSettings;
   const columnOrder = props.columnOrder;
