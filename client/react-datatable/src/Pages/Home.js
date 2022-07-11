@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import "../App.css";
 import { Button, FormControl, InputLabel, Select, OutlinedInput } from "@mui/material/";
 import { styled } from "@mui/material/styles";
 import { amber } from "@mui/material/colors";
 
+import { setIsLoadingFromDB } from "../Components/DataTableAssets/DataTable/tableSlice";
+
 import { Link } from "react-router-dom";
 
 function Home() {
+  const dispatch = useDispatch();
+
   const [userID, setUserID] = useState(1);
 
   const ColorButton = styled(Button)(({ theme }) => ({
@@ -19,6 +24,10 @@ function Home() {
 
   const handleUserChange = (event) => {
     setUserID(event.target.value);
+  };
+
+  const handleLogin = () => {
+    dispatch(setIsLoadingFromDB(true));
   };
 
   useEffect(() => {
@@ -47,7 +56,7 @@ function Home() {
               <option value={3}>User 3</option>
             </Select>
           </FormControl>
-          <Link className="Link" to="/DataTable2" state={{ userID: userID }}>
+          <Link className="Link" to="/DataTable2" state={{ userID: userID }} onClick={handleLogin}>
             <ColorButton variant="contained" size="medium">
               Login
             </ColorButton>

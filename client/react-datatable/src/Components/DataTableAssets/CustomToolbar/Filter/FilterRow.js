@@ -22,7 +22,6 @@ import { setFilterCount, pushFilterObjArr, setDeleteFilterRowIndex } from "./fil
 export default function FilterRow(props) {
   const dispatch = useDispatch();
 
-
   const isFilterAppliedClicked = useSelector((state) => state.filter.isFilterAppliedClicked);
   const filterObj = useSelector((state) => state.filter.filterObjArr[props.id]);
 
@@ -353,7 +352,7 @@ export default function FilterRow(props) {
 
   return (
     <Grid container spacing={0}>
-      <Grid item xs={10}>
+      <Grid item xs={11}>
         <Box
           noValidate
           component="form"
@@ -417,7 +416,7 @@ export default function FilterRow(props) {
       <Grid item xs={1}>
         <FormControl sx={{ mt: 2, minWidth: 150 }}>
           <Tooltip title={"Remove Filter"}>
-            <IconButton>
+            <IconButton sx={{ maxHeight: "50px", maxWidth: "50px" }}>
               <RemoveCircleOutlineIcon onClick={handleRemoveFilterRow} />
             </IconButton>
           </Tooltip>

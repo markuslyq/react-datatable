@@ -134,7 +134,7 @@ export default function FilterDialog(props) {
           </Grid>
         </Grid>
       </DialogTitle>
-      <DialogContent>{filterRowArr}</DialogContent>
+      <DialogContent style={{ overflowX: "hidden" }}>{filterRowArr}</DialogContent>
       <DialogActions>
         <ButtonGroup variant="text">
           <Button onClick={handleAddFilter}>ADD FILTER</Button>

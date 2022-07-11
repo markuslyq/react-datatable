@@ -2,13 +2,11 @@ import React from "react";
 import ValidationCheckButton from "./ValidationCheck/ValidationCheckButton";
 
 export default function CustomToolbarSelect(props) {
-  const columns = props.columns;
-  const selectedRows = props.selectedRows;
-  const data = props.data
+  const params = props.params;
 
   return (
     <React.Fragment>
-      <ValidationCheckButton columns={columns} selectedRows={selectedRows} data={data} />
+      <ValidationCheckButton params={params} />
     </React.Fragment>
   );
 }

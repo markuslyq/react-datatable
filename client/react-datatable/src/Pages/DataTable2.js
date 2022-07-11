@@ -8,23 +8,19 @@ import { amber } from "@mui/material/colors";
 import { styles } from "../Components/DataTableAssets/DataTable/styles";
 import tableTheme from "../Components/DataTableAssets/DataTable/tableTheme";
 
-import ArrayBody from "../Components/DataTableAssets/DataTable/TableBodyRenders/ArrayBody";
-import DateBody from "../Components/DataTableAssets/DataTable/TableBodyRenders/DateBody";
-import LongStringBody from "../Components/DataTableAssets/DataTable/TableBodyRenders/LongStringBody";
-import SubTableHeader from "../Components/DataTableAssets/DataTable/TableBodyRenders/SubTableHeader";
-import SubTableBody from "../Components/DataTableAssets/DataTable/TableBodyRenders/SubTableBody";
 import CustomToolbar from "../Components/DataTableAssets/CustomToolbar/CustomToolbar";
 import CustomToolbarSelect from "../Components/DataTableAssets/CustomToolbarSelect/CustomToolbarSelect";
 import CustomSnackbar from "../Components/Notification/CustomSnackbar";
 import getDefaultColumnOrder from "../Components/DataTableAssets/DataTable/HelperFunctions/getDefaultColumnOrder";
 import processDateObj from "../Components/DataTableAssets/DataTable/HelperFunctions/processDateObj";
-import addSubHeaders from "../Components/DataTableAssets/DataTable/HelperFunctions/getSubHeaders";
+import parseColumnSettings from "../Components/DataTableAssets/DataTable/HelperFunctions/parseColumnSettings";
 
 import { useLocation } from "react-router-dom";
 import { Link } from "react-router-dom";
 
 import axios from "axios";
 
+import { setIsLoadingFromDB } from "../Components/DataTableAssets/DataTable/tableSlice";
 import {
   clearFilterObjArr,
   setFilterUserID,
@@ -41,56 +37,7 @@ import {
 function DataTable2() {
   const dispatch = useDispatch();
 
-  const parseColumnSettings = (oldColumnSettings) => {
-    let parsedColumnSettings = [];
-
-    if (oldColumnSettings !== null) {
-      oldColumnSettings.forEach((oldColumnInfo) => {
-        oldColumnInfo["options"]["setCellProps"] = () => ({
-          style: styles.regularTableCell,
-        });
-
-        if (oldColumnInfo["dataType"] === "date") {
-          oldColumnInfo["options"]["customBodyRender"] = (value) => {
-            return <DateBody value={value} />;
-          };
-        }
-
-        if (oldColumnInfo["dataType"] === "longString") {
-          oldColumnInfo["options"]["customBodyRender"] = (value, tableMeta) => {
-            return <LongStringBody data={data} value={value} tableMeta={tableMeta} />;
-          };
-        }
-
-        if (oldColumnInfo["dataType"] === "array") {
-          oldColumnInfo["options"]["customBodyRender"] = (value, tableMeta) => {
-            return <ArrayBody value={value} tableMeta={tableMeta} />;
-          };
-        }
-
-        if (oldColumnInfo["dataType"] === "group") {
-          oldColumnInfo["options"]["customHeadLabelRender"] = (columnMeta) => {
-            return (
-              <SubTableHeader
-                isLoadingFromDB={isLoadingFromDB}
-                columns={columns}
-                updateIsLoadingFromDB={setIsLoadingFromDB}
-                columnMeta={columnMeta}
-              />
-            );
-            // return renderSubHeader(columnMeta);
-          };
-          oldColumnInfo["options"]["customBodyRender"] = (value, tableMeta) => {
-            return <SubTableBody data={data} value={value} tableMeta={tableMeta} />;
-            // return renderSubBody(value, tableMeta);
-          };
-        }
-        parsedColumnSettings.push(oldColumnInfo);
-      });
-    }
-
-    return parsedColumnSettings;
-  };
+  const isLoadingFromDB = useSelector((state) => state.table.isLoadingFromDB);
 
   const isFilterApplied = useSelector((state) => state.filter.isFilterApplied);
   const filteredData = useSelector((state) => state.filter.filteredData);
@@ -203,6 +150,7 @@ function DataTable2() {
     {
       name: "previous_company_info",
       label: "Previous Companies",
+      subHeaders: ["Company", "Department", "Years"],
       dataType: "group",
       options: {
         filter: false,
@@ -229,16 +177,14 @@ function DataTable2() {
     },
   ];
   const tableName = "Employee List";
-  const defaultColumnDetails = parseColumnSettings(columnDetails);
 
   const location = useLocation();
   const { userID } = location.state;
 
   const [data, setData] = useState([]);
+  const defaultColumnDetails = parseColumnSettings(columnDetails, data);
   const [columns, setColumns] = useState(defaultColumnDetails);
   const [columnOrder, setColumnOrder] = useState(getDefaultColumnOrder(columns));
-
-  const [isLoadingFromDB, setIsLoadingFromDB] = useState(true);
 
   const handleGet = () => {
     let dbColumnInfo = [];
@@ -257,7 +203,10 @@ function DataTable2() {
           console.log(response.data);
           if (response.data.length > 0) {
             if (response.data[0].column_order !== null) {
-              dbColumnInfo = parseColumnSettings(JSON.parse(response.data[0].column_settings));
+              dbColumnInfo = parseColumnSettings(
+                JSON.parse(response.data[0].column_settings),
+                data
+              );
               dbColumnOrder = JSON.parse(response.data[0].column_order);
             }
           }
@@ -276,14 +225,15 @@ function DataTable2() {
       response.data = processDateObj(response.data);
       setData(response.data);
       if (dbColumnInfo.length === 0) {
-        dbColumnInfo = addSubHeaders(columns, response.data);
+        dbColumnInfo = defaultColumnDetails;
+        console.log("ran");
         setColumns(dbColumnInfo);
       }
     });
   };
 
   const handleRevertSettings = () => {
-    setIsLoadingFromDB(true);
+    setColumns(defaultColumnDetails);
     setColumnOrder(getDefaultColumnOrder(columns));
     dispatch(setIsSnackbarOpen(true));
     dispatch(setVariant("success"));
@@ -301,11 +251,12 @@ function DataTable2() {
     }
     if (isLoadingFromDB) {
       handleGet();
+      dispatch(setIsLoadingFromDB(false));
     }
     if (isRevertClicked) {
       handleRevertSettings();
     }
-  });
+  }, [isRevertClicked, isLoadingFromDB]);
 
   const options = {
     draggableColumns: {
@@ -319,12 +270,6 @@ function DataTable2() {
     print: false,
     download: false,
     columnOrder: columnOrder,
-    // setTableProps: () => {
-    //   return {
-    //     paddingTop: "none",
-    //     paddingBottom: "none",
-    //   };
-    // },
     onColumnOrderChange: (newColumnOrder, columnIndex, newPosition) => {
       console.log(newColumnOrder);
       setColumnOrder(newColumnOrder);
@@ -340,7 +285,13 @@ function DataTable2() {
       );
     },
     customToolbarSelect: (selectedRows, displayData, setSelectedRows) => {
-      return <CustomToolbarSelect columns={columns} selectedRows={selectedRows} data={data} />;
+      let params = {
+        columns: columns,
+        selectedRows: selectedRows,
+        data: data,
+        columnOrder: columnOrder,
+      }
+      return <CustomToolbarSelect params={params}/>;
     },
   };
 

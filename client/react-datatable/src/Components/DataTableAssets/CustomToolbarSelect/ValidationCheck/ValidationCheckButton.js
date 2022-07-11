@@ -1,18 +1,31 @@
 import React from "react";
+import { useSelector, useDispatch } from "react-redux";
 import { IconButton, Tooltip } from "@mui/material";
 import FactCheckIcon from "@mui/icons-material/FactCheck";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 
+import capitalizeFirstLetter from "../../../../HelperFunctions/capitalizeFirstLetter";
+
+import {
+  setIsSnackbarOpen,
+  setVariant,
+  setDuration,
+  setMessage,
+} from "../../../Notification/snackbarSlice";
+
 export default function ValidationCheckButton(props) {
+  const dispatch = useDispatch();
+
   const navigate = useNavigate();
   const location = useLocation();
 
   const state = location.state;
-  const columns = props.columns;
-  const selectedRows = props.selectedRows;
-  const data = props.data;
+  const columns = props.params.columns;
+  const selectedRows = props.params.selectedRows;
+  const data = props.params.data;
+  const columnOrder = props.params.columnOrder;
   const colVariableToCheck = "country";
-  const colIndexToCheck = columns.findIndex((col) => col.name == colVariableToCheck);
+  // const colIndexToCheck = columns.findIndex((col) => col.name == colVariableToCheck);
 
   const getSelectedData = () => {
     let selectedData = [];
@@ -24,7 +37,7 @@ export default function ValidationCheckButton(props) {
 
   const isValidDataCheck = (selectedData) => {
     return selectedData.every(
-      (dataRow) => dataRow[colIndexToCheck] == selectedData[0][colIndexToCheck]
+      (dataRow) => dataRow[colVariableToCheck] == selectedData[0][colVariableToCheck]
     );
   };
 
@@ -34,14 +47,23 @@ export default function ValidationCheckButton(props) {
       let navObj = {
         state: {
           ...state,
-          columns: columns,
+          columns: JSON.stringify(columns),
+          columnOrder: columnOrder,
           selectedData: selectedData,
         },
       };
-      console.log(selectedData);
+      console.log(navObj);
       navigate("/PostValidationCheck", navObj);
     } else {
       console.log("diff country");
+      dispatch(setIsSnackbarOpen(true));
+      dispatch(setVariant("error"));
+      dispatch(setDuration(5000));
+      dispatch(
+        setMessage(
+          'Values of "' + capitalizeFirstLetter(colVariableToCheck) + '" column are different'
+        )
+      );
     }
   };
 
