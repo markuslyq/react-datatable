@@ -1,5 +1,6 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
+import "../../../../App.css";
 import { IconButton, Tooltip } from "@mui/material";
 import FactCheckIcon from "@mui/icons-material/FactCheck";
 import { Link, useNavigate, useLocation } from "react-router-dom";
@@ -69,7 +70,7 @@ export default function ValidationCheckButton(props) {
 
   return (
     <Tooltip title={"Country Validation Check"}>
-      <IconButton onClick={handleValidationCheck}>
+      <IconButton className="IconButton" onClick={handleValidationCheck}>
         <FactCheckIcon />
       </IconButton>
     </Tooltip>
