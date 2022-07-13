@@ -201,19 +201,9 @@ function DataTable2() {
           console.log(response.data);
           if (response.data.length > 0) {
             if (response.data[0].column_order !== null) {
-              dbColumnInfo = parseColumnSettings(
-                JSON.parse(response.data[0].column_settings),
-                data
-              );
+              dbColumnInfo = JSON.parse(response.data[0].column_settings);
               dbColumnOrder = JSON.parse(response.data[0].column_order);
             }
-          }
-
-          if (dbColumnInfo.length !== 0) {
-            setColumns(dbColumnInfo);
-          }
-          if (dbColumnOrder.length !== 0) {
-            setColumnOrder(dbColumnOrder);
           }
         });
     }
@@ -222,11 +212,17 @@ function DataTable2() {
       console.log(response);
       response.data = processDateObj(response.data);
       setData(response.data);
-      if (dbColumnInfo.length === 0) {
-        dbColumnInfo = defaultColumnDetails;
-        console.log("ran");
-        setColumns(dbColumnInfo);
+      if (dbColumnInfo.length !== 0) {
+        setColumns(parseColumnSettings(dbColumnInfo, response.data));
       }
+      if (dbColumnOrder.length !== 0) {
+        setColumnOrder(dbColumnOrder);
+      }
+      // if (dbColumnInfo.length === 0) {
+      //   dbColumnInfo = parseColumnSettings(columnDetails, data);
+      //   console.log("ran");
+      //   setColumns(dbColumnInfo);
+      // }
     });
   };
 

@@ -1,5 +1,4 @@
 import React from "react";
-import { useSelector, useDispatch } from "react-redux";
 import getMaxHeight from "../HelperFunctions/getMaxHeight";
 
 export default function LongStringBody(props) {
@@ -12,7 +11,7 @@ export default function LongStringBody(props) {
     <div
       style={{
         width: "500px",
-        height: maxHeight,
+        maxHeight: maxHeight > 100 ? 100 : maxHeight,
         overflow: "auto",
         padding: 0,
         margin: 0,
