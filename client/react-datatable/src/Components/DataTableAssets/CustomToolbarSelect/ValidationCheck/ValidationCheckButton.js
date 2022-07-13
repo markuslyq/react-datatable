@@ -1,9 +1,9 @@
 import React from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import "../../../../App.css";
 import { IconButton, Tooltip } from "@mui/material";
 import FactCheckIcon from "@mui/icons-material/FactCheck";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 import capitalizeFirstLetter from "../../../../HelperFunctions/capitalizeFirstLetter";
 
@@ -38,7 +38,7 @@ export default function ValidationCheckButton(props) {
 
   const isValidDataCheck = (selectedData) => {
     return selectedData.every(
-      (dataRow) => dataRow[colVariableToCheck] == selectedData[0][colVariableToCheck]
+      (dataRow) => dataRow[colVariableToCheck] === selectedData[0][colVariableToCheck]
     );
   };
 

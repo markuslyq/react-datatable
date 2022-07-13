@@ -14,7 +14,7 @@ export default function ArrayBody(props) {
       <Table
         sx={{
           minWidth: "120px",
-          height: maxHeight + 10,
+          height: maxHeight >= 100 ? maxHeight : maxHeight + 10,
           overflowY: "auto",
         }}
       >

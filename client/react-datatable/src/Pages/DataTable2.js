@@ -218,11 +218,6 @@ function DataTable2() {
       if (dbColumnOrder.length !== 0) {
         setColumnOrder(dbColumnOrder);
       }
-      // if (dbColumnInfo.length === 0) {
-      //   dbColumnInfo = parseColumnSettings(columnDetails, data);
-      //   console.log("ran");
-      //   setColumns(dbColumnInfo);
-      // }
     });
   };
 

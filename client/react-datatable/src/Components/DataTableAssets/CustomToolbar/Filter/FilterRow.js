@@ -17,7 +17,7 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
-import { setFilterCount, pushFilterObjArr, setDeleteFilterRowIndex } from "./filterSlice";
+import { pushFilterObjArr, setDeleteFilterRowIndex } from "./filterSlice";
 
 export default function FilterRow(props) {
   const dispatch = useDispatch();
@@ -109,7 +109,7 @@ export default function FilterRow(props) {
 
   const getDataType = () => {
     let selectedColumnName = columnSelected.split(".");
-    let columnIndex = columns.findIndex((col) => col.name == selectedColumnName[0]);
+    let columnIndex = columns.findIndex((col) => col.name === selectedColumnName[0]);
     if (columns[columnIndex]) {
       setDataType(columns[columnIndex]["dataType"]);
     }
@@ -117,7 +117,7 @@ export default function FilterRow(props) {
 
   const getConditionOptions = () => {
     if (dataType) {
-      let filterObj = filterCriteria.find((conditionObj) => conditionObj.dataType == dataType);
+      let filterObj = filterCriteria.find((conditionObj) => conditionObj.dataType === dataType);
       return filterObj.conditionOptions;
     }
     return [];
@@ -125,7 +125,7 @@ export default function FilterRow(props) {
 
   const getRenderOption = () => {
     if (dataType && conditionSelected) {
-      let filterObj = filterCriteria.find((conditionObj) => conditionObj.dataType == dataType);
+      let filterObj = filterCriteria.find((conditionObj) => conditionObj.dataType === dataType);
       let index = filterObj.conditionOptions.indexOf(conditionSelected);
       return filterObj.renderOptions[index];
     }

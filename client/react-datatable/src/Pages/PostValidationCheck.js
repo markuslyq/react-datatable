@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import "../App.css";
 import MUIDataTable from "mui-datatables";
 import { ThemeProvider } from "@mui/material/styles";

@@ -71,26 +71,6 @@ const processData = (result) => {
   return result;
 };
 
-const processTableSettings = (result) => {
-  for (let i = 0; i < result.length; i++) {
-    for (let key in result[i]) {
-      let value = result[i][key];
-      if (value !== null) {
-        if (typeof result[i][key] === "string") {
-          let str = result[i][key];
-          if (str != null) {
-            // Check if string is an array
-            if (isArray(str) || isJSON(str)) {
-              result[i][key] = JSONfn.parse(str);
-            }
-          }
-        }
-      }
-    }
-  }
-  return result;
-};
-
 const db = mysql.createConnection({
   user: "root",
   host: "localhost",

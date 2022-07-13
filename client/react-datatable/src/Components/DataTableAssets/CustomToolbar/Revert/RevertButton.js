@@ -1,7 +1,7 @@
 import React from "react";
 import "../../../../App.css";
-import { useSelector, useDispatch } from "react-redux";
-import { IconButton, Tooltip, Badge } from "@mui/material";
+import { useDispatch } from "react-redux";
+import { IconButton, Tooltip } from "@mui/material";
 import SettingsBackupRestoreIcon from "@mui/icons-material/SettingsBackupRestore";
 
 import { setIsRevertClicked } from "./revertSlice";

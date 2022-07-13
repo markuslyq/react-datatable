@@ -18,7 +18,6 @@ import {
   setIsFilterAppliedClicked,
   setDeleteFilterRowIndex,
 } from "./filterSlice";
-import { setDayOfYear } from "date-fns";
 import store from "../../../../store";
 
 function areArraysEqual(array1, array2) {

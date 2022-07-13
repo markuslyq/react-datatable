@@ -19,6 +19,9 @@ const getMaxHeight = (dataRow) => {
       }
     }
   }
+  if (maxHeight > 100) {
+    maxHeight = 100;
+  }
   return maxHeight;
 };
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import "../App.css";
 import { Button, FormControl, InputLabel, Select, OutlinedInput } from "@mui/material/";
 import { styled } from "@mui/material/styles";
