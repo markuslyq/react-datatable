@@ -22,8 +22,8 @@ export default function PostValidationCheck() {
 
   const userID = location.state.userID;
   const selectedData = location.state.selectedData;
-  const columnDetails = parseColumnSettings(JSON.parse(location.state.columns), selectedData);
-  const [columns, setColumns] = useState(columnDetails);
+  const columnDetails = JSON.parse(location.state.columns);
+  const columns = parseColumnSettings(columnDetails, selectedData);
   const [columnOrder, setColumnOrder] = useState(location.state.columnOrder);
 
   const handleBackButton = () => {
@@ -32,7 +32,7 @@ export default function PostValidationCheck() {
 
   useEffect(() => {
     console.log("Current Page: Post Validation Check Page");
-  });
+  }, []);
 
   const options = {
     draggableColumns: {
@@ -71,8 +71,8 @@ export default function PostValidationCheck() {
           state={{ userID: userID }}
           onClick={handleBackButton}
         >
-          <Button style={{ color: amber[800] }}>
-            <ArrowLeftIcon />
+          <Button style={{ color: amber[800], fontSize: "16px" }}>
+            <ArrowLeftIcon fontSize="large" />
             Back
           </Button>
         </Link>

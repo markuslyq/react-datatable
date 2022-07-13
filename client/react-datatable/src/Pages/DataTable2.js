@@ -5,7 +5,6 @@ import "../App.css";
 import MUIDataTable from "mui-datatables";
 import { IconButton, Avatar } from "@mui/material";
 import { amber } from "@mui/material/colors";
-import { styles } from "../Components/DataTableAssets/DataTable/styles";
 import tableTheme from "../Components/DataTableAssets/DataTable/tableTheme";
 
 import CustomToolbar from "../Components/DataTableAssets/CustomToolbar/CustomToolbar";
@@ -51,7 +50,6 @@ function DataTable2() {
       label: "User ID",
       dataType: "id",
       options: {
-        filter: false,
         display: false,
       },
     },
@@ -60,7 +58,7 @@ function DataTable2() {
       label: "Name",
       dataType: "string",
       options: {
-        filter: true,
+        display: true,
         sortThirdClickReset: true,
       },
     },
@@ -69,8 +67,7 @@ function DataTable2() {
       label: "Phone",
       dataType: "string",
       options: {
-        print: false,
-        filter: true,
+        display: true,
         sortThirdClickReset: true,
       },
     },
@@ -79,8 +76,7 @@ function DataTable2() {
       label: "Email",
       dataType: "string",
       options: {
-        filter: false,
-        print: false,
+        display: true,
         sortThirdClickReset: true,
       },
     },
@@ -89,7 +85,7 @@ function DataTable2() {
       label: "Start Date",
       dataType: "date",
       options: {
-        filter: false,
+        display: true,
         sortThirdClickReset: true,
       },
     },
@@ -98,7 +94,7 @@ function DataTable2() {
       label: "End Date",
       dataType: "date",
       options: {
-        filter: false,
+        display: true,
         sortThirdClickReset: true,
       },
     },
@@ -107,7 +103,7 @@ function DataTable2() {
       label: "Deadline",
       dataType: "date",
       options: {
-        filter: false,
+        display: true,
         sortThirdClickReset: true,
       },
     },
@@ -116,7 +112,7 @@ function DataTable2() {
       label: "Postal Zip",
       dataType: "string",
       options: {
-        filter: false,
+        display: true,
         sortThirdClickReset: true,
       },
     },
@@ -125,7 +121,7 @@ function DataTable2() {
       label: "Country",
       dataType: "string",
       options: {
-        filter: false,
+        display: true,
         sortThirdClickReset: true,
       },
     },
@@ -134,7 +130,7 @@ function DataTable2() {
       label: "Age",
       dataType: "number",
       options: {
-        filter: false,
+        display: true,
         sortThirdClickReset: true,
       },
     },
@@ -143,7 +139,7 @@ function DataTable2() {
       label: "Cars",
       dataType: "array",
       options: {
-        filter: false,
+        display: true,
         sort: false,
       },
     },
@@ -153,7 +149,7 @@ function DataTable2() {
       subHeaders: ["Company", "Department", "Years"],
       dataType: "group",
       options: {
-        filter: false,
+        display: true,
         sort: false,
       },
     },
@@ -162,7 +158,7 @@ function DataTable2() {
       label: "Password",
       dataType: "string",
       options: {
-        filter: false,
+        display: true,
         sortThirdClickReset: true,
       },
     },
@@ -171,7 +167,7 @@ function DataTable2() {
       label: "Notes",
       dataType: "longString",
       options: {
-        filter: false,
+        display: true,
         sortThirdClickReset: true,
       },
     },
@@ -269,6 +265,7 @@ function DataTable2() {
     selectableRowsHideCheckboxes: true,
     print: false,
     download: false,
+    viewColumns: false,
     columnOrder: columnOrder,
     onColumnOrderChange: (newColumnOrder, columnIndex, newPosition) => {
       console.log(newColumnOrder);
@@ -281,6 +278,7 @@ function DataTable2() {
           data={data}
           columnOrder={columnOrder}
           tableName={tableName}
+          setColumns={setColumns}
         />
       );
     },
@@ -290,8 +288,8 @@ function DataTable2() {
         selectedRows: selectedRows,
         data: data,
         columnOrder: columnOrder,
-      }
-      return <CustomToolbarSelect params={params}/>;
+      };
+      return <CustomToolbarSelect params={params} setSelectedRows={setSelectedRows} />;
     },
   };
 

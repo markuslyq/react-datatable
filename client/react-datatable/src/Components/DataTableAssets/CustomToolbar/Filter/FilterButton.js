@@ -212,7 +212,7 @@ export default function FilterButton(props) {
     return formattedFilteredData;
   };
 
-  const handleClick = () => {
+  const handleFilterClick = () => {
     console.log("Filter icon pressed!");
     dispatch(openFilterDialog());
   };
@@ -263,7 +263,7 @@ export default function FilterButton(props) {
   return (
     <React.Fragment>
       <Tooltip title={"Filter"}>
-        <IconButton onClick={handleClick}>
+        <IconButton onClick={handleFilterClick}>
           <Badge badgeContent={filterCount ? filterCount : 0} color="info">
             <FilterListIcon />
           </Badge>

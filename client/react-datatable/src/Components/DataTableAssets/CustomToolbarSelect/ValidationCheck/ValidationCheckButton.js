@@ -55,7 +55,7 @@ export default function ValidationCheckButton(props) {
       console.log(navObj);
       navigate("/PostValidationCheck", navObj);
     } else {
-      console.log("diff country");
+      console.log("Different country");
       dispatch(setIsSnackbarOpen(true));
       dispatch(setVariant("error"));
       dispatch(setDuration(5000));
