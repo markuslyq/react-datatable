@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import "../../../../App.css";
 import { IconButton, Tooltip } from "@mui/material";
 import ViewColumnIcon from "@mui/icons-material/ViewColumn";
 import ViewColumnsMenu from "./ViewColumnsMenu";
@@ -15,7 +16,7 @@ export default function ViewColumnsButton(props) {
   return (
     <React.Fragment>
       <Tooltip title="View Columns">
-        <IconButton onClick={handleViewCols}>
+        <IconButton className="IconButton" onClick={handleViewCols}>
           <ViewColumnIcon />
         </IconButton>
       </Tooltip>

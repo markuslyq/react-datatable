@@ -44,6 +44,8 @@ function DataTable2() {
 
   const isRevertClicked = useSelector((state) => state.revert.isRevertClicked);
 
+  const isToolbarOpen = useSelector((state) => state.toolbar.isToolbarOpen);
+
   const columnDetails = [
     {
       name: "user_id",
@@ -266,6 +268,7 @@ function DataTable2() {
     print: false,
     download: false,
     viewColumns: false,
+    search: isToolbarOpen,
     columnOrder: columnOrder,
     onColumnOrderChange: (newColumnOrder, columnIndex, newPosition) => {
       console.log(newColumnOrder);

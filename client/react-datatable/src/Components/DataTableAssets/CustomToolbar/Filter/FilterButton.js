@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import "../../../../App.css";
 import { IconButton, Tooltip, Badge } from "@mui/material";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import FilterDialog from "./FilterDialog";
@@ -37,7 +38,7 @@ function areArraysEqual(array1, array2) {
 
 export default function FilterButton(props) {
   const dispatch = useDispatch();
-  
+
   const isOnInitialLoad = useSelector((state) => state.filter.isOnInitialLoad);
   const filterCount = useSelector((state) => state.filter.filterCount);
   const isFilterAppliedClicked = useSelector((state) => state.filter.isFilterAppliedClicked);
@@ -263,7 +264,7 @@ export default function FilterButton(props) {
   return (
     <React.Fragment>
       <Tooltip title={"Filter"}>
-        <IconButton onClick={handleFilterClick}>
+        <IconButton className="IconButton" onClick={handleFilterClick}>
           <Badge badgeContent={filterCount ? filterCount : 0} color="info">
             <FilterListIcon />
           </Badge>
