@@ -7,7 +7,7 @@ export default function SubTableHeader(props) {
   const columnMeta = props.columnMeta;
 
   return (
-    <th>
+    <React.Fragment>
       <TableRow style={styles.multiValueMainHeader}>{columnMeta.label}</TableRow>
       <TableRow>
         {subHeaders.map((subHeader) => (
@@ -16,6 +16,6 @@ export default function SubTableHeader(props) {
           </TableCell>
         ))}
       </TableRow>
-    </th>
+    </React.Fragment>
   );
 }

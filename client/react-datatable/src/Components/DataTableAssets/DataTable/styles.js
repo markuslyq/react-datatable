@@ -18,9 +18,6 @@ export const styles = {
     margin: 0,
     height: 20,
   },
-  multiValuesHeader: {
-    borderBottom: "1px solid rgba(224, 224, 224, 1)",
-  },
   multiValueMainHeader: {
     cursor: "grab",
     fontFamily: "Roboto-Regular",
