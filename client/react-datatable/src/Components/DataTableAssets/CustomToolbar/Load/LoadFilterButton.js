@@ -5,6 +5,8 @@ import { useLocation } from "react-router-dom";
 
 import axios from "axios";
 
+import isIsoDate from "../../../../HelperFunctions/isIsoDate";
+
 import { setFilterObjArr, setIsFilterAppliedClicked } from "../Filter/filterSlice";
 
 import {
@@ -21,12 +23,6 @@ export default function LoadFilterButton(props) {
   const { userID } = location.state;
   const tableName = props.tableName;
 
-  const isIsoDate = (dateStr) => {
-    if (!/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/.test(dateStr)) return false;
-    var d = new Date(dateStr);
-    return d.toISOString() === dateStr;
-  };
-
   const processSettings = (settingsToProcess) => {
     for (let i = 0; i < settingsToProcess.length; i++) {
       if (
@@ -39,6 +35,9 @@ export default function LoadFilterButton(props) {
             settingsToProcess[i]["value"][key] = newDate;
           }
         }
+      } else if (isIsoDate(settingsToProcess[i]["value"])) {
+        let newDate = new Date(settingsToProcess[i]["value"]);
+        settingsToProcess[i]["value"] = newDate;
       }
     }
     return settingsToProcess;

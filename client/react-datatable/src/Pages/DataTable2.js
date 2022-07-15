@@ -24,6 +24,7 @@ import {
   clearFilterObjArr,
   setFilterUserID,
   setIsOnInitialLoad,
+  setIsFilterApplied,
 } from "../Components/DataTableAssets/CustomToolbar/Filter/filterSlice";
 import { setIsRevertClicked } from "../Components/DataTableAssets/CustomToolbar/Revert/revertSlice";
 import {
@@ -32,6 +33,7 @@ import {
   setDuration,
   setMessage,
 } from "../Components/Notification/snackbarSlice";
+import { setIsToolbarOpen } from "../Components/DataTableAssets/CustomToolbar/ToolbarToggle/toolbarSlice";
 
 function DataTable2() {
   const dispatch = useDispatch();
@@ -177,7 +179,7 @@ function DataTable2() {
   const tableName = "Employee List";
 
   const location = useLocation();
-  const { userID } = location.state;
+  const userID = Number(location.state.userID);
 
   const [data, setData] = useState([]);
   const defaultColumnDetails = parseColumnSettings(columnDetails, data);
@@ -221,6 +223,14 @@ function DataTable2() {
     });
   };
 
+  const handleDiffUserLogin = () => {
+    dispatch(clearFilterObjArr());
+    dispatch(setFilterUserID(userID));
+    dispatch(setIsFilterApplied(false));
+    dispatch(setIsOnInitialLoad(true));
+    dispatch(setIsToolbarOpen(false));
+  };
+
   const handleRevertSettings = () => {
     setColumns(defaultColumnDetails);
     setColumnOrder(getDefaultColumnOrder(columns));
@@ -234,9 +244,7 @@ function DataTable2() {
   useEffect(() => {
     console.log("Current Page: DataTable");
     if (filterUserID !== userID) {
-      dispatch(clearFilterObjArr());
-      dispatch(setFilterUserID(userID));
-      dispatch(setIsOnInitialLoad(true));
+      handleDiffUserLogin();
     }
     if (isLoadingFromDB) {
       handleGet();
@@ -297,7 +305,7 @@ function DataTable2() {
           paddingRight: 30,
         }}
       >
-        <Link className="Link" to="/Home">
+        <Link className="Link" to="/Home" state={{ userID: userID }}>
           <IconButton aria-label="backArrow">
             <img src={require("../Images/CSIT.png")} width="40%" />
           </IconButton>

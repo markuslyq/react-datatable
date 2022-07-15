@@ -1,6 +1,7 @@
 import { styles } from "../styles";
 
 import ArrayBody from "../TableBodyRenders/ArrayBody";
+import ArrayHeader from "../TableBodyRenders/ArrayHeader";
 import DateBody from "../TableBodyRenders/DateBody";
 import LongStringBody from "../TableBodyRenders/LongStringBody";
 import SubTableHeader from "../TableBodyRenders/SubTableHeader";
@@ -28,6 +29,11 @@ const parseColumnSettings = (oldColumnSettings, data) => {
       }
 
       if (oldColumnInfo["dataType"] === "array") {
+        oldColumnInfo["options"]["customHeadLabelRender"] = (columnMeta) => {
+          return (
+            <ArrayHeader columnMeta={columnMeta} />
+          );
+        };
         oldColumnInfo["options"]["customBodyRender"] = (value, tableMeta) => {
           return <ArrayBody value={value} tableMeta={tableMeta} />;
         };

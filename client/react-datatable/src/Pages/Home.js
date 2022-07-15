@@ -7,12 +7,14 @@ import { amber } from "@mui/material/colors";
 
 import { setIsLoadingFromDB } from "../Components/DataTableAssets/DataTable/tableSlice";
 
+import { useLocation } from "react-router-dom";
 import { Link } from "react-router-dom";
 
 function Home() {
   const dispatch = useDispatch();
 
-  const [userID, setUserID] = useState(1);
+  const location = useLocation();
+  const [userID, setUserID] = useState(location.state.userID ? Number(location.state.userID) : 1);
 
   const ColorButton = styled(Button)(({ theme }) => ({
     color: theme.palette.getContrastText(amber[500]),
