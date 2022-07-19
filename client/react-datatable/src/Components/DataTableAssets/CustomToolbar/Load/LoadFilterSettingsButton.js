@@ -16,7 +16,7 @@ import {
   setMessage,
 } from "../../../Notification/snackbarSlice";
 
-export default function LoadFilterButton(props) {
+export default function LoadFilterSettingsButton(props) {
   const dispatch = useDispatch();
 
   const location = useLocation();

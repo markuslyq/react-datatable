@@ -12,7 +12,7 @@ import {
   setMessage,
 } from "../../../Notification/snackbarSlice";
 
-export default function SaveFilterButton(props) {
+export default function SaveFilterSettingsButton(props) {
   const dispatch = useDispatch();
 
   const filterSettings = useSelector((state) => state.filter.filterObjArr);
