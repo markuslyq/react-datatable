@@ -6,6 +6,8 @@ import MUIDataTable from "mui-datatables";
 import { IconButton, Avatar } from "@mui/material";
 import { amber } from "@mui/material/colors";
 import tableTheme from "../Components/DataTableAssets/DataTable/tableTheme";
+import defaultTableOptions from "../Components/DataTableAssets/DataTable/Props/defaultTableOptions";
+import defaultTableColumn from "../Components/DataTableAssets/DataTable/Props/columnDetails";
 
 import CustomToolbar from "../Components/DataTableAssets/CustomToolbar/CustomToolbar";
 import CustomToolbarSelect from "../Components/DataTableAssets/CustomToolbarSelect/CustomToolbarSelect";
@@ -48,134 +50,7 @@ function DataTable2() {
 
   const isToolbarOpen = useSelector((state) => state.toolbar.isToolbarOpen);
 
-  const columnDetails = [
-    {
-      name: "user_id",
-      label: "User ID",
-      dataType: "id",
-      options: {
-        display: false,
-      },
-    },
-    {
-      name: "name",
-      label: "Name",
-      dataType: "string",
-      options: {
-        display: true,
-        sortThirdClickReset: true,
-      },
-    },
-    {
-      name: "phone",
-      label: "Phone",
-      dataType: "string",
-      options: {
-        display: true,
-        sortThirdClickReset: true,
-      },
-    },
-    {
-      name: "email",
-      label: "Email",
-      dataType: "string",
-      options: {
-        display: true,
-        sortThirdClickReset: true,
-      },
-    },
-    {
-      name: "start_date",
-      label: "Start Date",
-      dataType: "date",
-      options: {
-        display: true,
-        sortThirdClickReset: true,
-      },
-    },
-    {
-      name: "end_date",
-      label: "End Date",
-      dataType: "date",
-      options: {
-        display: true,
-        sortThirdClickReset: true,
-      },
-    },
-    {
-      name: "deadline",
-      label: "Deadline",
-      dataType: "date",
-      options: {
-        display: true,
-        sortThirdClickReset: true,
-      },
-    },
-    {
-      name: "postal_code",
-      label: "Postal Zip",
-      dataType: "string",
-      options: {
-        display: true,
-        sortThirdClickReset: true,
-      },
-    },
-    {
-      name: "country",
-      label: "Country",
-      dataType: "string",
-      options: {
-        display: true,
-        sortThirdClickReset: true,
-      },
-    },
-    {
-      name: "age",
-      label: "Age",
-      dataType: "number",
-      options: {
-        display: true,
-        sortThirdClickReset: true,
-      },
-    },
-    {
-      name: "cars",
-      label: "Cars",
-      dataType: "array",
-      options: {
-        display: true,
-        sort: false,
-      },
-    },
-    {
-      name: "previous_company_info",
-      label: "Previous Companies",
-      subHeaders: ["Company", "Department", "Years"],
-      dataType: "group",
-      options: {
-        display: true,
-        sort: false,
-      },
-    },
-    {
-      name: "password",
-      label: "Password",
-      dataType: "string",
-      options: {
-        display: true,
-        sortThirdClickReset: true,
-      },
-    },
-    {
-      name: "notes",
-      label: "Notes",
-      dataType: "longString",
-      options: {
-        display: true,
-        sortThirdClickReset: true,
-      },
-    },
-  ];
+  const columnDetails = defaultTableColumn;
   const tableName = "Employee List";
 
   const location = useLocation();
@@ -185,10 +60,12 @@ function DataTable2() {
   const defaultColumnDetails = parseColumnSettings(columnDetails, data);
   const [columns, setColumns] = useState(defaultColumnDetails);
   const [columnOrder, setColumnOrder] = useState(getDefaultColumnOrder(columns));
+  const [numRowsPerPage, setNumRowsPerPage] = useState(10);
 
   const handleGet = () => {
     let dbColumnInfo = [];
     let dbColumnOrder = [];
+    let dbNumRowsPerPage = 10;
 
     if (!isRevertClicked) {
       //Get table configurations
@@ -203,8 +80,13 @@ function DataTable2() {
           console.log(response.data);
           if (response.data.length > 0) {
             if (response.data[0].column_order !== null) {
-              dbColumnInfo = JSON.parse(response.data[0].column_settings);
               dbColumnOrder = JSON.parse(response.data[0].column_order);
+            }
+            if (response.data[0].column_settings !== null) {
+              dbColumnInfo = JSON.parse(response.data[0].column_settings);
+            }
+            if (response.data[0].num_rows_per_page !== 10) {
+              dbNumRowsPerPage = response.data[0].num_rows_per_page;
             }
           }
         });
@@ -219,6 +101,9 @@ function DataTable2() {
       }
       if (dbColumnOrder.length !== 0) {
         setColumnOrder(dbColumnOrder);
+      }
+      if (dbNumRowsPerPage !== 10) {
+        setNumRowsPerPage(dbNumRowsPerPage);
       }
     });
   };
@@ -255,23 +140,18 @@ function DataTable2() {
     }
   }, [isRevertClicked, isLoadingFromDB]);
 
+  const defaultOptions = defaultTableOptions;
+
   const options = {
-    draggableColumns: {
-      enabled: true,
-      transitionTime: 300,
-    },
-    filter: false,
-    responsive: "standard",
-    selectableRowsOnClick: true,
-    selectableRowsHideCheckboxes: true,
-    print: false,
-    download: false,
-    viewColumns: false,
+    ...defaultOptions,
     search: isToolbarOpen,
+    rowsPerPage: numRowsPerPage,
     columnOrder: columnOrder,
     onColumnOrderChange: (newColumnOrder, columnIndex, newPosition) => {
-      console.log(newColumnOrder);
       setColumnOrder(newColumnOrder);
+    },
+    onChangeRowsPerPage: (numberOfRows) => {
+      setNumRowsPerPage(numberOfRows);
     },
     customToolbar: () => {
       return (
@@ -280,6 +160,7 @@ function DataTable2() {
           data={data}
           columnOrder={columnOrder}
           tableName={tableName}
+          numRowsPerPage={numRowsPerPage}
           setColumns={setColumns}
         />
       );

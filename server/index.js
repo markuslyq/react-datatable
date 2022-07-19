@@ -107,20 +107,23 @@ app.put("/updateColumnSettings", (req, res) => {
   const table_name = req.body.tableName;
   const column_order = JSON.stringify(req.body.columnOrder);
   const column_settings = JSON.stringify(req.body.columnSettings);
+  const num_rows_per_page = req.body.numRowsPerPage;
   const queryArr = [
     user_id,
     table_name,
     column_order,
     column_settings,
+    num_rows_per_page,
     column_order,
     column_settings,
+    num_rows_per_page,
   ];
 
   const updateStatement = `
-  INSERT INTO settings.table_settings (user_id, table_name, column_order, column_settings)
-  VALUES (?, ?, ?, ?)
+  INSERT INTO settings.table_settings (user_id, table_name, column_order, column_settings, num_rows_per_page)
+  VALUES (?, ?, ?, ?, ?)
   ON DUPLICATE KEY
-  UPDATE column_order = ?, column_settings = ?;`;
+  UPDATE column_order = ?, column_settings = ?, num_rows_per_page = ?;`;
 
   db.query(updateStatement, queryArr, (err, result) => {
     if (!err) {

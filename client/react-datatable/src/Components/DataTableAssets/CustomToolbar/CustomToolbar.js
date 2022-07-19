@@ -1,10 +1,10 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import RevertButton from "./Revert/RevertButton";
-import SaveTableButton from "./Save/SaveTableButton";
-import SaveFilterButton from "./Save/SaveFilterButton";
+import SaveTableSettingsButton from "./Save/SaveTableSettingsButton";
+import SaveFilterSettingsButton from "./Save/SaveFilterSettingsButton";
 import FilterButton from "./Filter/FilterButton";
-import LoadFilterButton from "./Load/LoadFilterButton";
+import LoadFilterSettingsButton from "./Load/LoadFilterSettingsButton";
 import ViewColumnsButton from "./ViewColumns/ViewColumnsButton";
 import OpenToolbarButton from "./ToolbarToggle/OpenToolbarButton";
 import CloseToolbarButton from "./ToolbarToggle/CloseToolbarButton";
@@ -16,6 +16,7 @@ export default function CustomToolbar(props) {
   const columns = props.columns;
   const data = props.data;
   const tableName = props.tableName;
+  const numRowsPerPage = props.numRowsPerPage;
 
   return (
     <React.Fragment>
@@ -23,13 +24,14 @@ export default function CustomToolbar(props) {
         <React.Fragment>
           <ViewColumnsButton columns={columns} setColumns={props.setColumns} />
           <RevertButton />
-          <SaveTableButton
+          <SaveTableSettingsButton
             columnSettings={columns}
             columnOrder={columnOrder}
             tableName={tableName}
+            numRowsPerPage={numRowsPerPage}
           />
-          <SaveFilterButton tableName={tableName} />
-          <LoadFilterButton tableName={tableName} />
+          <SaveFilterSettingsButton tableName={tableName} />
+          <LoadFilterSettingsButton tableName={tableName} />
           <FilterButton columns={columns} data={data} />
           <CloseToolbarButton />
         </React.Fragment>

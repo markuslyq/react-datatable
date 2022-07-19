@@ -12,7 +12,7 @@ import {
   setMessage,
 } from "../../../Notification/snackbarSlice";
 
-export default function SaveTableButton(props) {
+export default function SaveTableSettingsButton(props) {
   const dispatch = useDispatch();
 
   const location = useLocation();
@@ -21,9 +21,11 @@ export default function SaveTableButton(props) {
   const tableName = props.tableName;
   const columnSettings = props.columnSettings;
   const columnOrder = props.columnOrder;
+  const numRowsPerPage = props.numRowsPerPage;
 
   const handleSaveTable = () => {
     console.log("Save Button Clicked!");
+    console.log(numRowsPerPage);
     // console.log("userID on save table button click: " + userID);
     axios
       .put("http://localhost:3001/updateColumnSettings", {
@@ -31,6 +33,7 @@ export default function SaveTableButton(props) {
         tableName: tableName,
         columnOrder: columnOrder,
         columnSettings: columnSettings,
+        numRowsPerPage: numRowsPerPage,
       })
       .then((response) => {
         dispatch(setIsSnackbarOpen(true));
