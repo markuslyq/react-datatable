@@ -21,7 +21,10 @@ import { Link } from "react-router-dom";
 
 import axios from "axios";
 
-import { setIsLoadingFromDB } from "../Components/DataTableAssets/DataTable/tableSlice";
+import {
+  setIsLoadingFromDB,
+  setIsSorted,
+} from "../Components/DataTableAssets/DataTable/tableSlice";
 import {
   clearFilterObjArr,
   setFilterUserID,
@@ -40,21 +43,28 @@ import { setIsToolbarOpen } from "../Components/DataTableAssets/CustomToolbar/To
 function DataTable2() {
   const dispatch = useDispatch();
 
+  //Table Slice
   const isLoadingFromDB = useSelector((state) => state.table.isLoadingFromDB);
+  const isSorted = useSelector((state) => state.table.isSorted);
 
+  //Filter Slice
   const isFilterApplied = useSelector((state) => state.filter.isFilterApplied);
   const filteredData = useSelector((state) => state.filter.filteredData);
   const filterUserID = useSelector((state) => state.filter.filterUserID);
 
+  //Revert Slice
   const isRevertClicked = useSelector((state) => state.revert.isRevertClicked);
 
+  //Toolbar Slice
   const isToolbarOpen = useSelector((state) => state.toolbar.isToolbarOpen);
 
-  const columnDetails = defaultTableColumn;
-  const tableName = "Employee List";
-
+  //User ID
   const location = useLocation();
   const userID = Number(location.state.userID);
+
+  //Column Details
+  const columnDetails = JSON.parse(JSON.stringify(defaultTableColumn));
+  const tableName = "Employee List";
 
   const [data, setData] = useState([]);
   const defaultColumnDetails = parseColumnSettings(columnDetails, data);
@@ -117,8 +127,10 @@ function DataTable2() {
   };
 
   const handleRevertSettings = () => {
+    // console.log("defaultColumnDetails");
     setColumns(defaultColumnDetails);
     setColumnOrder(getDefaultColumnOrder(columns));
+    setNumRowsPerPage(10);
     dispatch(setIsSnackbarOpen(true));
     dispatch(setVariant("success"));
     dispatch(setDuration(3000));
@@ -153,6 +165,13 @@ function DataTable2() {
     onChangeRowsPerPage: (numberOfRows) => {
       setNumRowsPerPage(numberOfRows);
     },
+    onColumnSortChange: (changedColumn, direction) => {
+      if (direction !== "none") {
+        dispatch(setIsSorted(true));
+      } else {
+        dispatch(setIsSorted(false));
+      }
+    },
     customToolbar: () => {
       return (
         <CustomToolbar
@@ -166,13 +185,13 @@ function DataTable2() {
       );
     },
     customToolbarSelect: (selectedRows, displayData, setSelectedRows) => {
-      let params = {
+      let selectParams = {
         columns: columns,
         selectedRows: selectedRows,
         data: data,
         columnOrder: columnOrder,
       };
-      return <CustomToolbarSelect params={params} setSelectedRows={setSelectedRows} />;
+      return <CustomToolbarSelect params={selectParams} setSelectedRows={setSelectedRows} />;
     },
   };
 
