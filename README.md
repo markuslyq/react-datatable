@@ -2,6 +2,10 @@
 
 React-Datatable is a responsive datatables component built on [MUI-Datatables](https://github.com/gregnb/mui-datatables).  It comes with features like sorting, search, customisable layout (view/hide columns, draggable columns, changing number of rows per page), saving of customised layout, customised filtering, saving of filter settings, selectable rows and pagination.
 
+<div align="center">
+	<img src="https://raw.githubusercontent.com/markuslyq/react-datatable/main/docs/docs%20images/datatable%20-%20customisable%20layout.gif" />
+</div>
+
 ## Usage
 
 ```js
