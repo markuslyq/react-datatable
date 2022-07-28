@@ -85,7 +85,7 @@ function DataTable2() {
       ...defaultOptions,
       rowsPerPage: numRowsPerPage,
       columnOrder: columnOrder,
-      customToolbar: true,
+      customToolbar: false,
       customToolbarSelect: true,
     },
     onViewColumnChange: (newColumns) => {
