@@ -52,6 +52,8 @@ function DataTable2() {
   ];
 
   const [columnDetails, setColumnDetails] = useState(defaultColumnDetails);
+  const [columnOrder, setColumnOrder] = useState([0,1,2,3]);
+  const [numRowsPerPage, setNumRowsPerPage] = useState(10);
 
   const data = [
    { name: "Joe James", company: "Test Corp", city: "Yonkers", state: "NY" },
@@ -72,10 +74,25 @@ function DataTable2() {
       rowsPerPageOptions: [10, 20, 50, 100],
       jumpToPage: true,
       rowsPerPage: 10,
-      columnOrder: [0,1,2,3],
+      columnOrder: columnOrder,
       customToolbar: true,
       customToolbarSelect: true,
-    }
+    },
+    onViewColumnChange: (newColumnDetails) => {
+      console.log(columnDetails);
+      console.log(newColumnDetails);
+    },
+    onColumnOrderChange: (newColumnOrder) => {
+      console.log("oldColumnOrder: " + columnOrder);
+      console.log("newColumnOrder: " + newColumnOrder);
+    },
+    onRowsPerPageChange: (newRowsPerPage) => {
+      console.log("oldRowsPerPage: " + numRowsPerPage);
+      console.log("newRowsPerPage: " + newRowsPerPage);
+    },
+    onFilterSaveClick: (filterSettings) => {
+      console.log(filterSettings);
+    },
   };
 
   return (
