@@ -1,75 +1,32 @@
 import React, { useState, useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { ThemeProvider } from "@mui/material/styles";
 import "../App.css";
-import MUIDataTable from "mui-datatables";
 import { IconButton, Avatar } from "@mui/material";
 import { amber } from "@mui/material/colors";
-import tableTheme from "../Components/DataTableAssets/DataTable/tableTheme";
 import defaultTableOptions from "../Components/DataTableAssets/DataTable/Props/defaultTableOptions";
 import defaultTableColumn from "../Components/DataTableAssets/DataTable/Props/columnDetails";
 
-import CustomToolbar from "../Components/DataTableAssets/CustomToolbar/CustomToolbar";
-import CustomToolbarSelect from "../Components/DataTableAssets/CustomToolbarSelect/CustomToolbarSelect";
-import CustomSnackbar from "../Components/Notification/CustomSnackbar";
+import ReactDataTable from "../Components/DataTableAssets/DataTable/ReactDataTable";
+
 import getDefaultColumnOrder from "../Components/DataTableAssets/DataTable/HelperFunctions/getDefaultColumnOrder";
 import processDateObj from "../Components/DataTableAssets/DataTable/HelperFunctions/processDateObj";
-import parseColumnSettings from "../Components/DataTableAssets/DataTable/HelperFunctions/parseColumnSettings";
 
 import { useLocation } from "react-router-dom";
 import { Link } from "react-router-dom";
 
 import axios from "axios";
 
-import {
-  setIsLoadingFromDB,
-  setIsSorted,
-} from "../Components/DataTableAssets/DataTable/tableSlice";
-import {
-  clearFilterObjArr,
-  setFilterUserID,
-  setIsOnInitialLoad,
-  setIsFilterApplied,
-} from "../Components/DataTableAssets/CustomToolbar/Filter/filterSlice";
-import { setIsRevertClicked } from "../Components/DataTableAssets/CustomToolbar/Revert/revertSlice";
-import {
-  setIsSnackbarOpen,
-  setVariant,
-  setDuration,
-  setMessage,
-} from "../Components/Notification/snackbarSlice";
-import { setIsToolbarOpen } from "../Components/DataTableAssets/CustomToolbar/ToolbarToggle/toolbarSlice";
-
 function DataTable2() {
-  const dispatch = useDispatch();
-
-  //Table Slice
-  const isLoadingFromDB = useSelector((state) => state.table.isLoadingFromDB);
-  const isSorted = useSelector((state) => state.table.isSorted);
-
-  //Filter Slice
-  const isFilterApplied = useSelector((state) => state.filter.isFilterApplied);
-  const filteredData = useSelector((state) => state.filter.filteredData);
-  const filterUserID = useSelector((state) => state.filter.filterUserID);
-
-  //Revert Slice
-  const isRevertClicked = useSelector((state) => state.revert.isRevertClicked);
-
-  //Toolbar Slice
-  const isToolbarOpen = useSelector((state) => state.toolbar.isToolbarOpen);
-
   //User ID
   const location = useLocation();
   const userID = Number(location.state.userID);
 
   //Column Details
-  const columnDetails = JSON.parse(JSON.stringify(defaultTableColumn));
+  const defaultColumnDetails = JSON.parse(JSON.stringify(defaultTableColumn));
   const tableName = "Employee List";
 
   const [data, setData] = useState([]);
-  const defaultColumnDetails = parseColumnSettings(columnDetails, data);
-  const [columns, setColumns] = useState(defaultColumnDetails);
-  const [columnOrder, setColumnOrder] = useState(getDefaultColumnOrder(columns));
+  const [columnDetails, setColumnDetails] = useState(defaultColumnDetails);
+  const [columnOrder, setColumnOrder] = useState(getDefaultColumnOrder(columnDetails));
   const [numRowsPerPage, setNumRowsPerPage] = useState(10);
 
   const handleGet = () => {
@@ -77,37 +34,35 @@ function DataTable2() {
     let dbColumnOrder = [];
     let dbNumRowsPerPage = 10;
 
-    if (!isRevertClicked) {
-      //Get table configurations
-      axios
-        .get("http://localhost:3001/getTableSettings", {
-          params: {
-            userID: userID,
-            tableName: tableName,
-          },
-        })
-        .then((response) => {
-          console.log(response.data);
-          if (response.data.length > 0) {
-            if (response.data[0].column_order !== null) {
-              dbColumnOrder = JSON.parse(response.data[0].column_order);
-            }
-            if (response.data[0].column_settings !== null) {
-              dbColumnInfo = JSON.parse(response.data[0].column_settings);
-            }
-            if (response.data[0].num_rows_per_page !== 10) {
-              dbNumRowsPerPage = response.data[0].num_rows_per_page;
-            }
+    axios
+      .get("http://localhost:3001/getTableSettings", {
+        params: {
+          userID: userID,
+          tableName: tableName,
+        },
+      })
+      .then((response) => {
+        console.log(response.data);
+        if (response.data.length > 0) {
+          if (response.data[0].column_order !== null) {
+            dbColumnOrder = JSON.parse(response.data[0].column_order);
           }
-        });
-    }
+          if (response.data[0].column_settings !== null) {
+            dbColumnInfo = JSON.parse(response.data[0].column_settings);
+          }
+          if (response.data[0].num_rows_per_page !== 10) {
+            dbNumRowsPerPage = response.data[0].num_rows_per_page;
+          }
+        }
+      });
+
     //Get table data
     axios.get("http://localhost:3001/getData").then((response) => {
       console.log(response);
       response.data = processDateObj(response.data);
       setData(response.data);
       if (dbColumnInfo.length !== 0) {
-        setColumns(parseColumnSettings(dbColumnInfo, response.data));
+        setColumnDetails(dbColumnInfo);
       }
       if (dbColumnOrder.length !== 0) {
         setColumnOrder(dbColumnOrder);
@@ -118,80 +73,35 @@ function DataTable2() {
     });
   };
 
-  const handleDiffUserLogin = () => {
-    dispatch(clearFilterObjArr());
-    dispatch(setFilterUserID(userID));
-    dispatch(setIsFilterApplied(false));
-    dispatch(setIsOnInitialLoad(true));
-    dispatch(setIsToolbarOpen(false));
-  };
-
-  const handleRevertSettings = () => {
-    // console.log("defaultColumnDetails");
-    setColumns(defaultColumnDetails);
-    setColumnOrder(getDefaultColumnOrder(columns));
-    setNumRowsPerPage(10);
-    dispatch(setIsSnackbarOpen(true));
-    dispatch(setVariant("success"));
-    dispatch(setDuration(3000));
-    dispatch(setMessage("Revert Successfully"));
-    dispatch(setIsRevertClicked(false));
-  };
-
   useEffect(() => {
     console.log("Current Page: DataTable");
-    if (filterUserID !== userID) {
-      handleDiffUserLogin();
-    }
-    if (isLoadingFromDB) {
-      handleGet();
-      dispatch(setIsLoadingFromDB(false));
-    }
-    if (isRevertClicked) {
-      handleRevertSettings();
-    }
-  }, [isRevertClicked, isLoadingFromDB]);
+    handleGet();
+  }, []);
 
   const defaultOptions = defaultTableOptions;
 
-  const options = {
-    ...defaultOptions,
-    search: isToolbarOpen,
-    rowsPerPage: numRowsPerPage,
-    columnOrder: columnOrder,
-    onColumnOrderChange: (newColumnOrder, columnIndex, newPosition) => {
-      setColumnOrder(newColumnOrder);
+  const tableOptions = {
+    options: {
+      ...defaultOptions,
+      rowsPerPage: numRowsPerPage,
+      columnOrder: columnOrder,
+      customToolbar: true,
+      customToolbarSelect: true,
     },
-    onChangeRowsPerPage: (numberOfRows) => {
-      setNumRowsPerPage(numberOfRows);
+    onViewColumnChange: (newColumns) => {
+      console.log(columnDetails);
+      console.log(newColumns);
     },
-    onColumnSortChange: (changedColumn, direction) => {
-      if (direction !== "none") {
-        dispatch(setIsSorted(true));
-      } else {
-        dispatch(setIsSorted(false));
-      }
+    onColumnOrderChange: (newColumnOrder) => {
+      console.log("oldColumnOrder: " + columnOrder);
+      console.log("newColumnOrder: " + newColumnOrder);
     },
-    customToolbar: () => {
-      return (
-        <CustomToolbar
-          columns={columns}
-          data={data}
-          columnOrder={columnOrder}
-          tableName={tableName}
-          numRowsPerPage={numRowsPerPage}
-          setColumns={setColumns}
-        />
-      );
+    onRowsPerPageChange: (newRowsPerPage) => {
+      console.log("oldRowsPerPage: " + numRowsPerPage);
+      console.log("newRowsPerPage: " + newRowsPerPage);
     },
-    customToolbarSelect: (selectedRows, displayData, setSelectedRows) => {
-      let selectParams = {
-        columns: columns,
-        selectedRows: selectedRows,
-        data: data,
-        columnOrder: columnOrder,
-      };
-      return <CustomToolbarSelect params={selectParams} setSelectedRows={setSelectedRows} />;
+    onFilterSaveClick: (filterSettings) => {
+      console.log(filterSettings);
     },
   };
 
@@ -215,21 +125,13 @@ function DataTable2() {
           <label style={{ marginLeft: 5, fontFamily: "Roboto-Regular" }}>User {userID}</label>
         </div>
       </div>
-      <CustomSnackbar />
-      <ThemeProvider theme={tableTheme}>
-        {columns !== null && columnOrder !== null && data !== [] ? (
-          <MUIDataTable
-            title={tableName}
-            data={isFilterApplied ? filteredData : data}
-            columns={columns}
-            options={options}
-          />
-        ) : (
-          <React.Fragment>
-            <img src={require("../Images/loading.gif")} width="10%" />
-          </React.Fragment>
-        )}
-      </ThemeProvider>
+      <ReactDataTable
+        tableName={tableName}
+        data={data}
+        defaultColumnDetails={defaultTableColumn}
+        columnDetails={columnDetails}
+        tableOptions={tableOptions}
+      />
     </React.Fragment>
   );
 }

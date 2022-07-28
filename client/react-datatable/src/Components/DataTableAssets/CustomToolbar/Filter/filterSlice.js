@@ -3,20 +3,17 @@ import { createSlice } from "@reduxjs/toolkit";
 const filterSlice = createSlice({
   name: "filter",
   initialState: {
-    filterUserID: -1,
     isOnInitialLoad: false,
     isFilterDialogOpen: false,
     isFilterAppliedClicked: false,
     isFilterApplied: false,
+    isFilterSaveClicked: false,
     filterCount: 0,
     filterObjArr: [],
     deleteFilterRowIndex: -1,
     filteredData: [],
   },
   reducers: {
-    setFilterUserID: (state, action) => {
-      state.filterUserID = action.payload;
-    },
     setIsOnInitialLoad: (state, action) => {
       state.isOnInitialLoad = action.payload;
     },
@@ -34,6 +31,9 @@ const filterSlice = createSlice({
     },
     setIsFilterApplied: (state, action) => {
       state.isFilterApplied = action.payload;
+    },
+    setIsFilterSaveClicked: (state, action) => {
+      state.isFilterSaveClicked = action.payload;
     },
     clearFilterObjArr: (state) => {
       state.filterObjArr = [];
@@ -57,13 +57,13 @@ const filterSlice = createSlice({
 });
 
 export const {
-  setFilterUserID,
   setIsOnInitialLoad,
   openFilterDialog,
   closeFilterDialog,
   setFilterCount,
   setIsFilterAppliedClicked,
   setIsFilterApplied,
+  setIsFilterSaveClicked,
   clearFilterObjArr,
   pushFilterObjArr,
   setFilterObjArr,

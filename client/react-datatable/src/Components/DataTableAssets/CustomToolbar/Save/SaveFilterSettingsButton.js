@@ -1,9 +1,11 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { IconButton, Tooltip, Badge } from "@mui/material";
+import { IconButton, Tooltip } from "@mui/material";
 import { useLocation } from "react-router-dom";
 
 import axios from "axios";
+
+import { setIsFilterSaveClicked } from "../Filter/filterSlice";
 
 import {
   setIsSnackbarOpen,
@@ -23,6 +25,7 @@ export default function SaveFilterSettingsButton(props) {
 
   const handleSaveFilter = () => {
     console.log("Save Filter Clicked!");
+    dispatch(setIsFilterSaveClicked(true));
     // console.log("userID on save filter button click: " + userID);
     // console.log(filterSettings);
     axios

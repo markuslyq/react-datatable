@@ -18,6 +18,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import { pushFilterObjArr, setDeleteFilterRowIndex } from "./filterSlice";
+import filterConditions from "./FilterProps/filterConditions";
 
 export default function FilterRow(props) {
   const dispatch = useDispatch();
@@ -69,43 +70,7 @@ export default function FilterRow(props) {
   const columns = props.columns;
   const data = props.data;
 
-  const filterCriteria = [
-    {
-      dataType: "id",
-      conditionOptions: ["EQUAL"],
-      renderOptions: ["numOnlyMultiEntry"],
-    },
-    {
-      dataType: "string",
-      conditionOptions: ["EQUAL", "NOT EQUAL", "CONTAIN"],
-      renderOptions: ["multiEntry", "multiEntry", "multiEntryFreeSolo"],
-    },
-    {
-      dataType: "longString",
-      conditionOptions: ["EQUAL", "NOT EQUAL", "CONTAIN"],
-      renderOptions: ["multiEntry", "multiEntry", "multiEntryFreeSolo"],
-    },
-    {
-      dataType: "date",
-      conditionOptions: ["AFTER", "BEFORE", "BETWEEN", "ISEMPTY"],
-      renderOptions: ["datePicker", "datePicker", "twoDatePicker", "empty"],
-    },
-    {
-      dataType: "number",
-      conditionOptions: ["EQUAL", "LESS THAN", "MORE THAN"],
-      renderOptions: ["numOnlyMultiEntry", "numOnlyTextBox", "numOnlyTextBox"],
-    },
-    {
-      dataType: "array",
-      conditionOptions: ["IN LIST", "NOT IN LIST", "LIST NOT EQUAL", "CONTAIN"],
-      renderOptions: ["multiEntry", "multiEntry", "multiEntry", "multiEntryFreeSolo"],
-    },
-    {
-      dataType: "group",
-      conditionOptions: ["IN LIST", "NOT IN LIST", "LIST NOT EQUAL", "CONTAIN"],
-      renderOptions: ["multiEntry", "multiEntry", "multiEntry", "multiEntryFreeSolo"],
-    },
-  ];
+  const filterCriteria = filterConditions;
 
   const getDataType = () => {
     let selectedColumnName = columnSelected.split(".");
