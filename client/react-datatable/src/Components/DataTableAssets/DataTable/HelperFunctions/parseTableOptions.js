@@ -42,6 +42,10 @@ export default function parseTableOptions(tableOptionsParams) {
         />
       );
     };
+    parsedTableOptions["download"] = false;
+    parsedTableOptions["filter"] = false;
+    parsedTableOptions["print"] = false;
+    parsedTableOptions["viewColumn"] = false;
   }
 
   if (tableOptionsParams.options.customToolbarSelect) {
