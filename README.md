@@ -21,7 +21,7 @@ function DataTable2() {
     name: "name",
     label: "Name",
     options: {
-     filter: true,
+     display: true,
      sort: true,
     }
    },
@@ -29,7 +29,7 @@ function DataTable2() {
     name: "company",
     label: "Company",
     options: {
-     filter: true,
+     display: true,
      sort: false,
     }
    },
@@ -37,7 +37,7 @@ function DataTable2() {
     name: "city",
     label: "City",
     options: {
-     filter: true,
+     display: true,
      sort: false,
     }
    },
@@ -45,7 +45,7 @@ function DataTable2() {
     name: "state",
     label: "State",
     options: {
-     filter: true,
+     display: false,
      sort: false,
     }
    },
