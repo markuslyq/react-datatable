@@ -134,9 +134,9 @@ It accepts all [options](https://github.com/gregnb/mui-datatables#options) that 
 |**`customToolbarSelect`**|boolean|false|Enable/disable the customed toolbar upon selection of rows, which includes deselecting all rows and a validation check.
 
 #### Callback functions
-|Name|Type|Default|Description
-|:--:|:-----|:--|:-----|
-|**`onViewColumnChange `**|function||Callback function that triggers when a column view has been changed. `function(newColumnDetails: object) => void`
-|**`onColumnOrderChange `**|function||Callback function that triggers when the column order has been changed. `function(newColumnOrder: array) => void`
-|**`onRowsPerPageChange `**|function||Callback function that triggers when the number of rows per page has been changed. `function(newRowsPerPage: number) => void`
-|**`onFilterSaveClick `**|function||Callback function that triggers when the save filter settings button has been click. `function(filterSettings: array) => void`
+|Name|Type|Description
+|:--:|:-----|:-----|
+|**`onViewColumnChange `**|function|Callback function that triggers when a column view has been changed. `function(newColumnDetails: object) => void`
+|**`onColumnOrderChange `**|function|Callback function that triggers when the column order has been changed. `function(newColumnOrder: array) => void`
+|**`onRowsPerPageChange `**|function|Callback function that triggers when the number of rows per page has been changed. `function(newRowsPerPage: number) => void`
+|**`onFilterSaveClick `**|function|Callback function that triggers when the save filter settings button has been click. `function(filterSettings: array) => void`
