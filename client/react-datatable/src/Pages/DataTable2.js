@@ -88,9 +88,9 @@ function DataTable2() {
       customToolbar: true,
       customToolbarSelect: true,
     },
-    onViewColumnChange: (newColumns) => {
+    onViewColumnChange: (newColumnDetails) => {
       console.log(columnDetails);
-      console.log(newColumns);
+      console.log(newColumnDetails);
     },
     onColumnOrderChange: (newColumnOrder) => {
       console.log("oldColumnOrder: " + columnOrder);
