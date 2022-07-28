@@ -6,7 +6,7 @@ export default function LongStringBody(props) {
   const value = props.value;
   const tableMeta = props.tableMeta;
 
-  let maxHeight = getMaxHeight(data[tableMeta.rowIndex]);
+  let maxHeight = getMaxHeight(tableMeta.rowData);
   return (
     <div
       style={{

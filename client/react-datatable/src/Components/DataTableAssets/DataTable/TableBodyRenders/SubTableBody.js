@@ -43,7 +43,7 @@ export default function SubTableBody(props) {
   }
   subKeys = subKeys.sort();
   let rows = formatRows(value, subKeys);
-  let maxHeight = getMaxHeight(data[tableMeta.rowIndex]);
+  let maxHeight = getMaxHeight(tableMeta.rowData);
   return (
     <div style={{ maxHeight: 100, overflowY: "auto" }}>
       <Table sx={{ height: maxHeight + 10 }}>

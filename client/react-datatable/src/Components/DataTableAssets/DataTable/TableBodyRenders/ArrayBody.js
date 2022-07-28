@@ -4,11 +4,10 @@ import { Table, TableBody, TableRow, TableCell, Paper } from "@mui/material";
 import getMaxHeight from "../HelperFunctions/getMaxHeight";
 
 export default function ArrayBody(props) {
-  const value = props.value
-  const tableMeta = props.tableMeta
+  const value = props.value;
+  const tableMeta = props.tableMeta;
 
   let maxHeight = getMaxHeight(tableMeta.rowData);
-  // if (value != null) {
   return (
     <React.Fragment>
       <Table
