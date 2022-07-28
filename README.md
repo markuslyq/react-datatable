@@ -19,8 +19,20 @@ The component accepts the following props:
 |**`tableOptions`**|object|Options used to describe table
 
 ### TableOptions
-TableOptions takes an `options` object and 4 other callback functions.
+TableOptions accepts an 'options' object and 4 other optional callback functions - `onViewColumnChange`, `onColumnOrderChange`, `onRowsPerPageChange` and `onFilterSaveClick`.
 
-#### ·options·
+#### Options
+It accepts all [options](https://github.com/gregnb/mui-datatables#options) that MUI-Datatables takes in and on top of that, accepts 2 more other options:  
+|Name|Type|Default|Description
+|:--:|:-----|:--|:-----|
+|**`customToolbar`**|boolean|false|Enable/disable the customed toolbar, which includes customed filters, loading of filters, saving of table layout & filter settings, reverting to the default layout, view/hide columns and search.
+|**`customToolbarSelect`**|boolean|false|Enable/disable the customed toolbar upon selection of rows, which includes deselecting all rows and a validation check.
 
+#### Callback functions
+|Name|Type|Default|Description
+|:--:|:-----|:--|:-----|
+|**`onViewColumnChange `**|function||Callback function that triggers when a column view has been changed. `function(newColumnDetails: object) => void``
+|**`onColumnOrderChange `**|function||
+|**`onRowsPerPageChange `**|function||Enable/disable case sensitivity for search.
+|**`onFilterSaveClick `**|function||Enable/disable case sensitivity for search.
 
