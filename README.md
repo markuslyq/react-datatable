@@ -4,6 +4,90 @@ React-Datatable is a responsive datatables component built on [MUI-Datatables](h
 
 ## Usage
 
+```js
+import React, { useState } from "react"
+import ReactDataTable from "ReactDataTable";
+
+function DataTable2() {
+
+  const tableName = "Employee List";
+
+  const defaultColumnDetails = [
+   {
+    name: "name",
+    label: "Name",
+    options: {
+     filter: true,
+     sort: true,
+    }
+   },
+   {
+    name: "company",
+    label: "Company",
+    options: {
+     filter: true,
+     sort: false,
+    }
+   },
+   {
+    name: "city",
+    label: "City",
+    options: {
+     filter: true,
+     sort: false,
+    }
+   },
+   {
+    name: "state",
+    label: "State",
+    options: {
+     filter: true,
+     sort: false,
+    }
+   },
+  ];
+
+  const [columnDetails, setColumnDetails] = useState(defaultColumnDetails);
+
+  const data = [
+   { name: "Joe James", company: "Test Corp", city: "Yonkers", state: "NY" },
+   { name: "John Walsh", company: "Test Corp", city: "Hartford", state: "CT" },
+   { name: "Bob Herm", company: "Test Corp", city: "Tampa", state: "FL" },
+   { name: "James Houston", company: "Test Corp", city: "Dallas", state: "TX" },
+  ];
+
+  tableOptions = {
+    options: {
+      draggableColumns: {
+        enabled: true,
+        transitionTime: 300,
+      },
+      responsive: "standard",
+      selectableRowsOnClick: true,
+      selectableRowsHideCheckboxes: true,
+      rowsPerPageOptions: [10, 20, 50, 100],
+      jumpToPage: true,
+      rowsPerPage: 10,
+      columnOrder: [0,1,2,3],
+      customToolbar: true,
+      customToolbarSelect: true,
+    }
+  };
+
+  return (
+    <ReactDataTable 
+      tableName={tableName}
+      data={data}
+      defaultColumnDetails={defaultTableColumn}
+      columnDetails={columnDetails}
+      tableOptions={tableOptions}
+    />
+  );
+}  
+
+
+```
+
 ## API
 
 ### &lt;ReactDataTable />
@@ -31,8 +115,7 @@ It accepts all [options](https://github.com/gregnb/mui-datatables#options) that 
 #### Callback functions
 |Name|Type|Default|Description
 |:--:|:-----|:--|:-----|
-|**`onViewColumnChange `**|function||Callback function that triggers when a column view has been changed. `function(newColumnDetails: object) => void``
-|**`onColumnOrderChange `**|function||
-|**`onRowsPerPageChange `**|function||Enable/disable case sensitivity for search.
-|**`onFilterSaveClick `**|function||Enable/disable case sensitivity for search.
-
+|**`onViewColumnChange `**|function||Callback function that triggers when a column view has been changed. `function(newColumnDetails: object) => void`
+|**`onColumnOrderChange `**|function||Callback function that triggers when the column order has been changed. `function(newColumnOrder: array) => void`
+|**`onRowsPerPageChange `**|function||Callback function that triggers when the number of rows per page has been changed. `function(newRowsPerPage: number) => void`
+|**`onFilterSaveClick `**|function||Callback function that triggers when the save filter settings button has been click. `function(filterSettings: array) => void`
